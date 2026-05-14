@@ -1,7 +1,8 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
-import { FiLink } from 'react-icons/fi';
-import { BrandLogo } from '@/shared/ui/BrandLogo';
+import { Box, IconButton, Typography } from '@mui/material';
+import { FiLink, FiX } from 'react-icons/fi';
+import { LangThemeBar } from '@/shared/ui/LangSelector';
+import { useLang } from '@/shared/hooks/useLang';
 import type { ReactNode } from 'react';
 
 interface NavItem {
@@ -9,12 +10,6 @@ interface NavItem {
   path: string;
   icon: ReactNode;
 }
-
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Conexoes', path: '/connections', icon: <FiLink /> },
-];
-
-const SECTION_LABEL = 'MENU';
 
 interface SidebarNavItemProps {
   item: NavItem;
@@ -45,7 +40,6 @@ const SidebarNavItem = ({ item, isActive, onClick }: SidebarNavItemProps) => (
       },
     }}
   >
-    <Box sx={{ fontSize: 17, display: 'flex', flexShrink: 0 }}>{item.icon}</Box>
     <Box component="span">{item.label}</Box>
   </Box>
 );
@@ -57,6 +51,11 @@ interface AppSidebarProps {
 export const AppSidebar = ({ onNavigate }: AppSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLang();
+
+  const navItems: NavItem[] = [
+    { label: t.connections.title, path: '/connections', icon: <FiLink /> },
+  ];
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -80,19 +79,22 @@ export const AppSidebar = ({ onNavigate }: AppSidebarProps) => {
       }}
     >
       <Box
-        onClick={() => handleNav('/connections')}
         sx={{
           display: 'flex',
           alignItems: 'center',
-          px: 2.5,
-          minHeight: 56,
+          justifyContent: 'flex-end',
+          px: 2,
+          minHeight: 48,
           borderBottom: '1px solid',
           borderColor: 'divider',
           flexShrink: 0,
-          cursor: 'pointer',
         }}
       >
-        <BrandLogo size="md" />
+        {onNavigate && (
+          <IconButton onClick={onNavigate} size="small">
+            <FiX size={16} />
+          </IconButton>
+        )}
       </Box>
 
       <Box sx={{ flex: 1, overflowY: 'auto', pt: 2, pb: 1 }}>
@@ -101,10 +103,10 @@ export const AppSidebar = ({ onNavigate }: AppSidebarProps) => {
           color="text.secondary"
           sx={{ fontWeight: 700, px: 3, mb: 1, display: 'block', letterSpacing: '0.08em' }}
         >
-          {SECTION_LABEL}
+          {t.common.menu}
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
-          {NAV_ITEMS.map(item => (
+          {navItems.map(item => (
             <SidebarNavItem
               key={item.label}
               item={item}
@@ -112,6 +114,10 @@ export const AppSidebar = ({ onNavigate }: AppSidebarProps) => {
               onClick={() => handleNav(item.path)}
             />
           ))}
+        </Box>
+
+        <Box sx={{ px: 1.5, mt: 2 }}>
+          <LangThemeBar />
         </Box>
       </Box>
     </Box>

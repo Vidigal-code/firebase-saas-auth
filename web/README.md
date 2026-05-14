@@ -21,7 +21,7 @@ Frontend SPA (Single Page Application) do BroadcastApp, construído com **React 
 ```
 web/src/
 ├── app/                          # Camada de aplicação
-│   ├── providers/index.tsx       # ThemeProvider, Redux, React Query
+│   ├── providers/index.tsx       # ThemeProvider, LangProvider, Redux, React Query
 │   ├── router/index.tsx          # Rotas públicas e privadas
 │   └── store/index.ts            # Redux Store
 │
@@ -51,18 +51,27 @@ web/src/
 ├── shared/                       # Reutilizáveis globais
 │   ├── config/
 │   │   ├── env.ts                # Variáveis de ambiente tipadas
-│   │   └── firebase.ts           # Inicialização Firebase SDK
+│   │   ├── firebase.ts           # Inicialização Firebase SDK
+│   │   └── i18n.ts               # Configuração de idiomas (pt, en, es)
 │   ├── constants/theme.ts        # Paletas dark/light, layout, brand
+│   ├── langs/                    # Arquivos de tradução
+│   │   ├── pt.json               # Português
+│   │   ├── en.json               # English
+│   │   └── es.json               # Español
+│   ├── providers/
+│   │   └── LangProvider.tsx      # Context Provider de idioma
 │   ├── hooks/
 │   │   ├── useConfirmDialog.ts   # Estado do dialog de confirmação
 │   │   ├── useCurrentUser.ts     # Auth state do Firebase
 │   │   ├── useFirestoreCollection.ts # Listener genérico Firestore
+│   │   ├── useLang.ts            # Hook para acessar traduções
 │   │   └── usePagination.ts      # Paginação genérica reutilizável
 │   ├── lib/firestore.ts          # CRUD helpers (addDocument, updateDocument...)
 │   └── ui/
 │       ├── ActionButtonGroup.tsx  # Grid de botões proporcionais
 │       ├── ConfirmDialog.tsx      # Dialog de exclusão reutilizável
 │       ├── EmptyState.tsx         # Estado vazio padrão
+│       ├── LangSelector.tsx       # Seletor de idioma (pt/en/es)
 │       ├── PageHeader.tsx         # Header de página responsivo
 │       ├── PageLoader.tsx         # Spinner de carregamento
 │       ├── PaginationBar.tsx      # Barra de paginação
@@ -73,7 +82,7 @@ web/src/
         ├── DashboardLayout.tsx   # Layout autenticado (sidebar + header)
         ├── PublicLayout.tsx      # Layout público (header + footer)
         └── ui/
-            ├── AppHeader.tsx     # Header com avatar, tema, menu
+            ├── AppHeader.tsx     # Header com avatar, tema, idioma, menu
             ├── AppSidebar.tsx    # Sidebar com navegação
             ├── Footer.tsx        # Rodapé com créditos
             └── MobileDrawer.tsx  # Drawer mobile
@@ -92,11 +101,23 @@ VITE_FIREBASE_MESSAGING_SENDER_ID="" # Sender ID do Cloud Messaging
 VITE_FIREBASE_APP_ID=""               # App ID do Firebase
 VITE_FIREBASE_MEASUREMENT_ID=""       # ID do Google Analytics (opcional)
 VITE_START_THEME="dark"               # Tema inicial: "dark" ou "light"
+VITE_START_LANG="pt"                  # Idioma inicial: "pt", "en" ou "es"
 ```
 
 **Onde encontrar:** Firebase Console → ⚙️ Configurações do projeto → Seus apps → SDK Web → `firebaseConfig`
 
 **Importante:** O arquivo `.env` está no `.gitignore` e nunca deve ser commitado.
+
+### Internacionalização (i18n)
+
+O sistema de idiomas é baseado em arquivos JSON estáticos com um `LangProvider` React Context:
+
+- **Prioridade:** URL (`?lang=pt`) > localStorage > `.env` (`VITE_START_LANG`) > fallback (`pt`)
+- **Persistência:** `localStorage` com chave `broadcastapp:lang`
+- **Seletor:** Componente `LangSelector` no header de todas as páginas
+- **URL:** Suporta `?lang=pt&theme=dark` para links diretos
+
+Cada JSON contém todas as strings da aplicação organizadas por domínio (auth, connections, contacts, messages, home, common, lang).
 
 ### Comandos
 
@@ -110,7 +131,7 @@ npm run preview # Preview do build de produção
 
 ### Tema Dark/Light
 
-O sistema de temas usa MUI `createTheme` com duas paletas completas (`DARK_PALETTE` e `LIGHT_PALETTE`). Todos os componentes MUI possuem overrides para garantir contraste correto em ambos os modos. A preferência é persistida em `localStorage` com a chave `broadcastapp:theme`.
+O sistema de temas usa MUI `createTheme` com duas paletas completas (`DARK_PALETTE` e `LIGHT_PALETTE`). Todos os componentes MUI possuem overrides para garantir contraste correto em ambos os modos. A preferência é persistida em `localStorage` com a chave `broadcastapp:theme`. Também pode ser definido via URL: `?theme=dark`.
 
 ### Responsividade
 
@@ -141,7 +162,7 @@ web/src/
 ├── pages/         # Page composition (auth, connections, contacts, messages)
 ├── features/      # Business logic (CRUD hooks, feature-specific dialogs)
 ├── entities/      # Domain entities (api, model hooks, UI components)
-├── shared/        # Global reusables (config, hooks, lib, ui components)
+├── shared/        # Global reusables (config, hooks, langs, lib, ui components)
 └── widgets/       # Composite layouts (Dashboard, Public, Header, Sidebar)
 ```
 
@@ -158,11 +179,23 @@ VITE_FIREBASE_MESSAGING_SENDER_ID="" # Cloud Messaging sender ID
 VITE_FIREBASE_APP_ID=""               # Firebase App ID
 VITE_FIREBASE_MEASUREMENT_ID=""       # Google Analytics ID (optional)
 VITE_START_THEME="dark"               # Initial theme: "dark" or "light"
+VITE_START_LANG="pt"                  # Initial language: "pt", "en" or "es"
 ```
 
 **Where to find:** Firebase Console → ⚙️ Project settings → Your apps → Web SDK → `firebaseConfig`
 
 **Important:** The `.env` file is in `.gitignore` and must never be committed.
+
+### Internationalization (i18n)
+
+The language system is based on static JSON files with a `LangProvider` React Context:
+
+- **Priority:** URL (`?lang=pt`) > localStorage > `.env` (`VITE_START_LANG`) > fallback (`pt`)
+- **Persistence:** `localStorage` under `broadcastapp:lang`
+- **Selector:** `LangSelector` component in the header of all pages
+- **URL:** Supports `?lang=pt&theme=dark` for direct links
+
+Each JSON contains all application strings organized by domain (auth, connections, contacts, messages, home, common, lang).
 
 ### Commands
 
@@ -176,7 +209,7 @@ npm run preview # Preview production build
 
 ### Dark/Light Theme
 
-The theme system uses MUI `createTheme` with two complete palettes (`DARK_PALETTE` and `LIGHT_PALETTE`). All MUI components have style overrides ensuring proper contrast in both modes. Preference is persisted in `localStorage` under the key `broadcastapp:theme`.
+The theme system uses MUI `createTheme` with two complete palettes (`DARK_PALETTE` and `LIGHT_PALETTE`). All MUI components have style overrides ensuring proper contrast in both modes. Preference is persisted in `localStorage` under the key `broadcastapp:theme`. Can also be set via URL: `?theme=dark`.
 
 ### Responsiveness
 

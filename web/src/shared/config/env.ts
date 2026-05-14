@@ -7,4 +7,5 @@ export const ENV = {
   FIREBASE_APP_ID: import.meta.env.VITE_FIREBASE_APP_ID,
   FIREBASE_MEASUREMENT_ID: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
   START_THEME: import.meta.env.VITE_START_THEME,
+  START_LANG: import.meta.env.VITE_START_LANG,
 };

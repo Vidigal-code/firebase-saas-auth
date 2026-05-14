@@ -38,8 +38,28 @@ firebase-saas-auth/
 | 💬 **Mensagens** | Disparo em massa com seleção múltipla de contatos |
 | ⏰ **Agendamento** | Mensagens agendadas com processamento automático via Cloud Functions |
 | 🌗 **Tema Dark/Light** | Alternância dinâmica com persistência em localStorage |
+| 🌐 **Multi-idioma (i18n)** | Suporte a Português, English e Español com seletor dinâmico |
 | 📱 **100% Responsivo** | Layout adaptável para desktop, tablet e mobile |
 | 📄 **Paginação** | Listagens paginadas em todas as entidades |
+
+### Internacionalização (i18n)
+
+A plataforma suporta 3 idiomas com troca dinâmica:
+
+| Idioma | Código | Arquivo |
+|---|---|---|
+| Português | `pt` | `web/src/shared/langs/pt.json` |
+| English | `en` | `web/src/shared/langs/en.json` |
+| Español | `es` | `web/src/shared/langs/es.json` |
+
+**Formas de alterar o idioma:**
+1. **Seletor no header** — disponível em todas as páginas
+2. **URL parameter** — `?lang=pt` ou `?lang=en` ou `?lang=es`
+3. **URL com tema** — `?lang=pt&theme=dark`
+4. **Variável de ambiente** — `VITE_START_LANG="pt"` no `.env`
+5. **Cache automático** — salvo em `localStorage` com chave `broadcastapp:lang`
+
+**Prioridade de resolução:** URL > localStorage > .env > fallback (`pt`)
 
 ### Segurança (Firestore Rules)
 
@@ -89,7 +109,7 @@ web/src/
 ├── pages/         # Composição de páginas (Connections, Contacts, Messages)
 ├── features/      # Lógica de negócio (CRUD hooks, dialogs)
 ├── entities/      # Entidades de domínio (Connection, Contact, Message)
-├── shared/        # Componentes, hooks e utilitários reutilizáveis
+├── shared/        # Componentes, hooks, langs e utilitários reutilizáveis
 └── widgets/       # Layouts (Dashboard, Public, Header, Sidebar, Footer)
 ```
 
@@ -127,8 +147,28 @@ firebase-saas-auth/
 | 💬 **Messages** | Batch messaging with multiple contact selection |
 | ⏰ **Scheduling** | Scheduled messages with automatic processing via Cloud Functions |
 | 🌗 **Dark/Light Theme** | Dynamic toggle with localStorage persistence |
+| 🌐 **Multi-language (i18n)** | Portuguese, English and Spanish support with dynamic selector |
 | 📱 **100% Responsive** | Adaptive layout for desktop, tablet, and mobile |
 | 📄 **Pagination** | Paginated listings across all entities |
+
+### Internationalization (i18n)
+
+The platform supports 3 languages with dynamic switching:
+
+| Language | Code | File |
+|---|---|---|
+| Português | `pt` | `web/src/shared/langs/pt.json` |
+| English | `en` | `web/src/shared/langs/en.json` |
+| Español | `es` | `web/src/shared/langs/es.json` |
+
+**Ways to change the language:**
+1. **Header selector** — available on all pages
+2. **URL parameter** — `?lang=pt` or `?lang=en` or `?lang=es`
+3. **URL with theme** — `?lang=pt&theme=dark`
+4. **Environment variable** — `VITE_START_LANG="pt"` in `.env`
+5. **Automatic cache** — saved in `localStorage` under `broadcastapp:lang`
+
+**Resolution priority:** URL > localStorage > .env > fallback (`pt`)
 
 ### Security (Firestore Rules)
 
@@ -178,7 +218,7 @@ web/src/
 ├── pages/         # Page composition (Connections, Contacts, Messages)
 ├── features/      # Business logic (CRUD hooks, dialogs)
 ├── entities/      # Domain entities (Connection, Contact, Message)
-├── shared/        # Reusable components, hooks, and utilities
+├── shared/        # Reusable components, hooks, langs, and utilities
 └── widgets/       # Layouts (Dashboard, Public, Header, Sidebar, Footer)
 ```
 

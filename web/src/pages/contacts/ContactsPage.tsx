@@ -11,6 +11,7 @@ import { createContact, updateContact, deleteContact } from '@/entities/contact/
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
 import { usePagination } from '@/shared/hooks/usePagination';
+import { useLang } from '@/shared/hooks/useLang';
 import { PageLoader } from '@/shared/ui/PageLoader';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -23,49 +24,19 @@ interface ContactFormState { id: string | null; name: string; phone: string }
 const INITIAL_FORM: ContactFormState = { id: null, name: '', phone: '' };
 const GRID_COLUMNS = { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' };
 
-const buildSubtitle = (count: number) => `${count} contato(s) cadastrado(s)`;
-
-interface ContactDialogProps {
-  open: boolean;
-  form: ContactFormState;
-  isPending: boolean;
-  onChange: (field: 'name' | 'phone', value: string) => void;
-  onClose: () => void;
-  onSave: () => void;
-}
-
-const DIALOG_TITLES = { create: 'Novo Contato', edit: 'Editar Contato' } as const;
-const SAVE_LABELS = { idle: 'Salvar', pending: 'Salvando...' } as const;
-
-const ContactDialog = ({ open, form, isPending, onChange, onClose, onSave }: ContactDialogProps) => (
-  <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-    <DialogTitle>{form.id ? DIALOG_TITLES.edit : DIALOG_TITLES.create}</DialogTitle>
-    <DialogContent>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-        <TextField autoFocus label="Nome" value={form.name} onChange={e => onChange('name', e.target.value)} fullWidth />
-        <TextField label="Telefone" value={form.phone} onChange={e => onChange('phone', e.target.value)} fullWidth />
-      </Box>
-    </DialogContent>
-    <DialogActions sx={{ px: 3, pb: 2 }}>
-      <Button onClick={onClose} variant="text">Cancelar</Button>
-      <Button onClick={onSave} variant="contained" disabled={!form.name.trim() || !form.phone.trim() || isPending}>
-        {isPending ? SAVE_LABELS.pending : SAVE_LABELS.idle}
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
-
 interface ContactCardProps {
   name: string;
   phone: string;
+  editLabel: string;
+  deleteLabel: string;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-const ContactCard = ({ name, phone, onEdit, onDelete }: ContactCardProps) => {
+const ContactCard = ({ name, phone, editLabel, deleteLabel, onEdit, onDelete }: ContactCardProps) => {
   const actions = useMemo(
-    () => [buildEditAction(onEdit), buildDeleteAction(onDelete)],
-    [onEdit, onDelete],
+    () => [buildEditAction(onEdit, editLabel), buildDeleteAction(onDelete, deleteLabel)],
+    [onEdit, onDelete, editLabel, deleteLabel],
   );
 
   return (
@@ -96,6 +67,7 @@ export const ContactsPage = () => {
   const { uid } = useCurrentUser();
   const { confirmState, requestConfirm, closeConfirm, handleConfirm } = useConfirmDialog();
   const { page, pageCount, pageItems, hasPagination, goToPage } = usePagination(contacts);
+  const { t } = useLang();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState<ContactFormState>(INITIAL_FORM);
@@ -143,23 +115,25 @@ export const ContactsPage = () => {
   const handleDelete = useCallback(
     (id: string, contactName: string) => {
       requestConfirm(
-        'Excluir Contato',
-        `Tem certeza que deseja excluir o contato "${contactName}"? Essa acao nao pode ser desfeita.`,
+        t.contacts.deleteTitle,
+        t.contacts.deleteMessage.replace('{name}', contactName),
         () => deleteMut.mutate(id),
       );
     },
-    [requestConfirm, deleteMut],
+    [requestConfirm, deleteMut, t],
   );
 
   if (loading) return <PageLoader />;
 
   const hasContacts = contacts.length > 0;
+  const dialogTitle = form.id ? t.contacts.dialogEdit : t.contacts.dialogCreate;
+  const saveLabel = (createMut.isPending || updateMut.isPending) ? t.common.saving : t.common.save;
 
   return (
     <Box>
       <PageHeader
-        title="Contatos"
-        subtitle={buildSubtitle(contacts.length)}
+        title={t.contacts.title}
+        subtitle={t.contacts.subtitle.replace('{count}', String(contacts.length))}
         icon={<FiUsers />}
         action={
           <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' }, flexWrap: 'wrap' }}>
@@ -170,7 +144,7 @@ export const ContactsPage = () => {
               size="small"
               sx={{ flex: { xs: 1, sm: 'none' } }}
             >
-              Voltar
+              {t.common.back}
             </Button>
             <Button
               variant="contained"
@@ -178,14 +152,14 @@ export const ContactsPage = () => {
               onClick={openCreate}
               sx={{ flex: { xs: 1, sm: 'none' } }}
             >
-              Novo Contato
+              {t.contacts.newContact}
             </Button>
           </Box>
         }
       />
 
       {!hasContacts && (
-        <EmptyState icon={<FiUsers />} message="Nenhum contato. Adicione o primeiro!" />
+        <EmptyState icon={<FiUsers />} message={t.contacts.empty} />
       )}
 
       {hasContacts && (
@@ -195,6 +169,8 @@ export const ContactsPage = () => {
               key={c.id}
               name={c.name}
               phone={c.phone}
+              editLabel={t.common.edit}
+              deleteLabel={t.common.delete}
               onEdit={() => openEdit(c.id, c.name, c.phone)}
               onDelete={() => handleDelete(c.id, c.name)}
             />
@@ -202,29 +178,25 @@ export const ContactsPage = () => {
         </Box>
       )}
 
-      <PaginationBar
-        page={page}
-        pageCount={pageCount}
-        visible={hasPagination}
-        onChange={goToPage}
-      />
+      <PaginationBar page={page} pageCount={pageCount} visible={hasPagination} onChange={goToPage} />
 
-      <ContactDialog
-        open={dialogOpen}
-        form={form}
-        isPending={createMut.isPending || updateMut.isPending}
-        onChange={handleChange}
-        onClose={closeDialog}
-        onSave={handleSave}
-      />
+      <Dialog open={dialogOpen} onClose={closeDialog} maxWidth="xs" fullWidth>
+        <DialogTitle>{dialogTitle}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <TextField autoFocus label={t.contacts.nameLabel} value={form.name} onChange={e => handleChange('name', e.target.value)} fullWidth />
+            <TextField label={t.contacts.phoneLabel} value={form.phone} onChange={e => handleChange('phone', e.target.value)} fullWidth />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={closeDialog} variant="text">{t.common.cancel}</Button>
+          <Button onClick={handleSave} variant="contained" disabled={!form.name.trim() || !form.phone.trim() || createMut.isPending || updateMut.isPending}>
+            {saveLabel}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-      <ConfirmDialog
-        open={confirmState.open}
-        title={confirmState.title}
-        message={confirmState.message}
-        onConfirm={handleConfirm}
-        onCancel={closeConfirm}
-      />
+      <ConfirmDialog open={confirmState.open} title={confirmState.title} message={confirmState.message} onConfirm={handleConfirm} onCancel={closeConfirm} />
     </Box>
   );
 };

@@ -6,6 +6,7 @@ import { ConnectionCard } from '@/entities/connection/ui/ConnectionCard';
 import { ConnectionDialog } from '@/features/connection/ui/ConnectionDialog';
 import { useConnectionCrud } from '@/features/connection/hooks/useConnectionCrud';
 import { usePagination } from '@/shared/hooks/usePagination';
+import { useLang } from '@/shared/hooks/useLang';
 import { PageLoader } from '@/shared/ui/PageLoader';
 import { PageHeader } from '@/shared/ui/PageHeader';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -13,8 +14,6 @@ import { PaginationBar } from '@/shared/ui/PaginationBar';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 
 const GRID_COLUMNS = { xs: '1fr', sm: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' };
-
-const buildSubtitle = (count: number) => `${count} conexao(oes) ativa(s)`;
 
 const buildContactsPath = (id: string) => `/connections/${id}/contacts`;
 const buildMessagesPath = (id: string) => `/connections/${id}/messages`;
@@ -24,6 +23,7 @@ export const ConnectionsPage = () => {
   const navigate = useNavigate();
   const crud = useConnectionCrud();
   const { page, pageCount, pageItems, hasPagination, goToPage } = usePagination(connections);
+  const { t } = useLang();
 
   if (loading) return <PageLoader />;
 
@@ -32,18 +32,18 @@ export const ConnectionsPage = () => {
   return (
     <Box>
       <PageHeader
-        title="Conexoes"
-        subtitle={buildSubtitle(connections.length)}
+        title={t.connections.title}
+        subtitle={t.connections.subtitle.replace('{count}', String(connections.length))}
         icon={<FiLink />}
         action={
           <Button variant="contained" startIcon={<FiPlus size={16} />} onClick={crud.openCreate} sx={{ width: { xs: '100%', sm: 'auto' } }}>
-            Nova Conexao
+            {t.connections.newConnection}
           </Button>
         }
       />
 
       {!hasConnections && (
-        <EmptyState icon={<FiLink />} message="Nenhuma conexao ainda. Crie a primeira!" />
+        <EmptyState icon={<FiLink />} message={t.connections.empty} />
       )}
 
       {hasConnections && (

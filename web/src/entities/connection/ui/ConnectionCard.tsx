@@ -7,6 +7,7 @@ import {
   buildDeleteAction,
   type ActionItem,
 } from '@/shared/ui/ActionButtonGroup';
+import { useLang } from '@/shared/hooks/useLang';
 import { BRAND } from '@/shared/constants/theme';
 
 const NAV_ICON_SIZE = 13;
@@ -19,23 +20,7 @@ interface Props {
   onMessages: () => void;
 }
 
-const buildContactsAction = (onClick: () => void): ActionItem => ({
-  label: 'Contatos',
-  icon: <FiUsers size={NAV_ICON_SIZE} />,
-  variant: 'outlined',
-  color: 'primary',
-  onClick,
-});
-
-const buildMessagesAction = (onClick: () => void): ActionItem => ({
-  label: 'Mensagens',
-  icon: <FiMessageSquare size={NAV_ICON_SIZE} />,
-  variant: 'outlined',
-  color: 'secondary',
-  onClick,
-});
-
-const ConnectionCardHeader = ({ name }: Pick<Props, 'name'>) => (
+const ConnectionCardHeader = ({ name, activeLabel }: { name: string; activeLabel: string }) => (
   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
     <Box
       sx={{
@@ -61,23 +46,25 @@ const ConnectionCardHeader = ({ name }: Pick<Props, 'name'>) => (
       >
         {name}
       </Typography>
-      <Chip label="Ativa" color="success" size="small" sx={{ mt: 0.5 }} />
+      <Chip label={activeLabel} color="success" size="small" sx={{ mt: 0.5 }} />
     </Box>
   </Box>
 );
 
 export const ConnectionCard = ({ name, onEdit, onDelete, onContacts, onMessages }: Props) => {
-  const allActions = useMemo(() => [
-    buildContactsAction(onContacts),
-    buildMessagesAction(onMessages),
-    buildEditAction(onEdit),
-    buildDeleteAction(onDelete),
-  ], [onContacts, onMessages, onEdit, onDelete]);
+  const { t } = useLang();
+
+  const allActions: ActionItem[] = useMemo(() => [
+    { label: t.connections.contacts, icon: <FiUsers size={NAV_ICON_SIZE} />, variant: 'outlined', color: 'primary', onClick: onContacts },
+    { label: t.connections.messages, icon: <FiMessageSquare size={NAV_ICON_SIZE} />, variant: 'outlined', color: 'secondary', onClick: onMessages },
+    buildEditAction(onEdit, t.common.edit),
+    buildDeleteAction(onDelete, t.common.delete),
+  ], [t, onContacts, onMessages, onEdit, onDelete]);
 
   return (
     <Card sx={{ height: '100%' }}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <ConnectionCardHeader name={name} />
+        <ConnectionCardHeader name={name} activeLabel={t.connections.active} />
         <ActionButtonGroup actions={allActions} columns={2} />
       </CardContent>
     </Card>

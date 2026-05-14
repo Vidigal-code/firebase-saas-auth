@@ -1,12 +1,12 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Box, IconButton, Tooltip, Avatar, Menu, MenuItem,
+  Box, IconButton, Avatar, Menu, MenuItem,
   ListItemIcon, Divider, Typography,
 } from '@mui/material';
-import { FiSun, FiMoon, FiLogOut, FiLock, FiMenu } from 'react-icons/fi';
-import { ThemeModeContext } from '@/app/providers';
+import { FiLogOut, FiLock, FiMenu } from 'react-icons/fi';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
+import { useLang } from '@/shared/hooks/useLang';
 import { BrandLogo } from '@/shared/ui/BrandLogo';
 import { LAYOUT, BRAND } from '@/shared/constants/theme';
 
@@ -15,21 +15,6 @@ interface AppHeaderProps {
   onOpenPasswordDialog: () => void;
   onLogout: () => void;
 }
-
-const ThemeToggle = () => {
-  const { mode, toggleColorMode } = useContext(ThemeModeContext);
-  return (
-    <Tooltip title={mode === 'dark' ? 'Modo Claro' : 'Modo Escuro'}>
-      <IconButton
-        onClick={toggleColorMode}
-        size="small"
-        sx={{ border: '1px solid', borderColor: 'divider', borderRadius: `${LAYOUT.borderRadiusSm}px` }}
-      >
-        {mode === 'dark' ? <FiSun size={15} /> : <FiMoon size={15} />}
-      </IconButton>
-    </Tooltip>
-  );
-};
 
 const UserAvatar = ({ email }: { email: string }) => (
   <Avatar
@@ -44,6 +29,7 @@ const UserAvatar = ({ email }: { email: string }) => (
 
 export const AppHeader = ({ onDrawerToggle, onOpenPasswordDialog, onLogout }: AppHeaderProps) => {
   const { user } = useCurrentUser();
+  const { t } = useLang();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -89,20 +75,16 @@ export const AppHeader = ({ onDrawerToggle, onOpenPasswordDialog, onLogout }: Ap
 
       <Box sx={{ flex: 1 }} />
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-        <ThemeToggle />
-
-        <Box
-          onClick={openMenu}
-          sx={{
-            display: 'flex', alignItems: 'center', gap: 0.75,
-            cursor: 'pointer', borderRadius: `${LAYOUT.borderRadiusSm}px`,
-            px: 0.75, py: 0.5,
-            '&:hover': { bgcolor: 'action.hover' },
-          }}
-        >
-          <UserAvatar email={user?.email ?? ''} />
-        </Box>
+      <Box
+        onClick={openMenu}
+        sx={{
+          display: 'flex', alignItems: 'center', gap: 0.75,
+          cursor: 'pointer', borderRadius: `${LAYOUT.borderRadiusSm}px`,
+          px: 0.75, py: 0.5,
+          '&:hover': { bgcolor: 'action.hover' },
+        }}
+      >
+        <UserAvatar email={user?.email ?? ''} />
       </Box>
 
       <Menu
@@ -119,7 +101,7 @@ export const AppHeader = ({ onDrawerToggle, onOpenPasswordDialog, onLogout }: Ap
       >
         <Box sx={{ px: 2, py: 1 }}>
           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, display: 'block', letterSpacing: '0.05em' }}>
-            CONTA
+            {t.common.account}
           </Typography>
           <Typography variant="body2" sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {user?.email}
@@ -128,11 +110,11 @@ export const AppHeader = ({ onDrawerToggle, onOpenPasswordDialog, onLogout }: Ap
         <Divider />
         <MenuItem onClick={onPassword} sx={{ gap: 1.5, py: 1 }}>
           <ListItemIcon sx={{ minWidth: 'unset' }}><FiLock size={15} /></ListItemIcon>
-          Alterar Senha
+          {t.common.changePassword}
         </MenuItem>
         <MenuItem onClick={onLogoutClick} sx={{ gap: 1.5, py: 1, color: 'error.main' }}>
           <ListItemIcon sx={{ minWidth: 'unset', color: 'error.main' }}><FiLogOut size={15} /></ListItemIcon>
-          Sair
+          {t.common.logout}
         </MenuItem>
       </Menu>
     </Box>

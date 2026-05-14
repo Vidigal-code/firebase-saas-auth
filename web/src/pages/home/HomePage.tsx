@@ -4,28 +4,18 @@ import {
   FiUsers, FiMessageSquare, FiClock, FiShield, FiSmartphone, FiCheckCircle, FiArrowRight, FiZap,
 } from 'react-icons/fi';
 import { BRAND, LAYOUT } from '@/shared/constants/theme';
+import { useLang } from '@/shared/hooks/useLang';
 import type { ReactNode } from 'react';
-
 
 interface Feature { title: string; description: string; icon: ReactNode; badge?: string }
 interface Stat    { label: string; value: string }
 
-const FEATURES: Feature[] = [
-  { title: 'Gestão de Conexões',       description: 'Espaços isolados por cliente/projeto com total privacidade em arquitetura multi-tenant.',  icon: <FiUsers /> },
-  { title: 'Contatos Ilimitados',      description: 'Cadastre nome e telefone por conexão. Organize e gerencie leads com facilidade.',  icon: <FiSmartphone /> },
-  { title: 'Disparos em Massa',        description: 'Selecione múltiplos contatos e envie mensagens em batch com rastreamento de status.', icon: <FiMessageSquare />, badge: 'Popular' },
-  { title: 'Agendamento Inteligente',  description: 'Programe campanhas para horários específicos com atualização automática de status.',  icon: <FiClock />, badge: 'Novo' },
-  { title: 'Segurança Enterprise',     description: 'Firebase Auth com senhas fortes, isolamento via Firestore Rules entre clientes.',icon: <FiShield /> },
-  { title: 'Tempo Real',               description: 'Firestore Realtime Listeners para atualizações instantâneas no painel.',  icon: <FiCheckCircle /> },
+const FEATURE_ICONS: ReactNode[] = [
+  <FiUsers />, <FiSmartphone />, <FiMessageSquare />, <FiClock />, <FiShield />, <FiCheckCircle />,
 ];
 
-const STATS: Stat[] = [
-  { label: 'Conexões por cliente', value: 'Ilimitadas' },
-  { label: 'Latência Firestore',   value: '< 100ms' },
-  { label: 'Isolamento de dados',  value: '100%' },
-  { label: 'Uptime Firebase',      value: '99.99%' },
-];
-
+const FEATURE_KEYS = ['connections', 'contacts', 'broadcast', 'scheduling', 'security', 'realtime'] as const;
+const STAT_KEYS = ['connections', 'latency', 'isolation', 'uptime'] as const;
 
 const FeatureCard = ({ feature }: { feature: Feature }) => (
   <Card sx={{ height: '100%', position: 'relative', overflow: 'visible' }}>
@@ -61,68 +51,80 @@ const StatItem = ({ stat, index, total }: { stat: Stat; index: number; total: nu
   </Box>
 );
 
-
 export const HomePage = () => {
   const navigate = useNavigate();
+  const { t } = useLang();
+
+  const features: Feature[] = FEATURE_KEYS.map((key, i) => ({
+    title: t.home.features[key].title,
+    description: t.home.features[key].description,
+    icon: FEATURE_ICONS[i],
+    badge: (t.home.features[key] as any).badge,
+  }));
+
+  const stats: Stat[] = STAT_KEYS.map(key => ({
+    label: t.home.stats[key].label,
+    value: t.home.stats[key].value,
+  }));
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 4, md: 6 }, py: { xs: 2, md: 4 } }}>
 
       <Box sx={{ textAlign: 'center', maxWidth: 640, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5, px: 1 }}>
-        <Chip label="Plataforma SaaS Completa" variant="outlined" color="primary" sx={{ fontWeight: 700, borderRadius: '999px', fontSize: '0.7rem' }} />
+        <Chip label={t.home.badge} variant="outlined" color="primary" sx={{ fontWeight: 700, borderRadius: '999px', fontSize: '0.7rem' }} />
         <Typography variant="h3" sx={{ fontWeight: 800, fontSize: { xs: '1.6rem', sm: '2rem', md: '2.5rem' }, lineHeight: 1.2 }}>
-          {'Comunicação em massa '}
+          {`${t.home.heroTitle} `}
           <Box component="span" sx={{ background: BRAND.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            inteligente e segura
+            {t.home.heroHighlight}
           </Box>
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 480, lineHeight: 1.7, fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
-          Gerencie conexões, contatos e campanhas em uma plataforma SaaS isolada, em tempo real e com agendamento automático.
+          {t.home.heroDescription}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
           <Button variant="contained" size="medium" endIcon={<FiArrowRight />} onClick={() => navigate('/register')} sx={{ borderRadius: '999px', px: 3, fontWeight: 700, fontSize: '0.8rem' }}>
-            Começar Grátis
+            {t.home.startFree}
           </Button>
           <Button variant="outlined" size="medium" onClick={() => navigate('/login')} sx={{ borderRadius: '999px', px: 3, fontWeight: 700, fontSize: '0.8rem' }}>
-            Fazer Login
+            {t.home.doLogin}
           </Button>
         </Box>
       </Box>
 
       <Card sx={{ overflow: 'hidden' }}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' } }}>
-          {STATS.map((stat, i) => <StatItem key={stat.label} stat={stat} index={i} total={STATS.length} />)}
+          {stats.map((stat, i) => <StatItem key={stat.label} stat={stat} index={i} total={stats.length} />)}
         </Box>
       </Card>
 
       <Box>
         <Box sx={{ textAlign: 'center', mb: 3 }}>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, fontSize: { xs: '1.1rem', sm: '1.3rem' } }}>
-            Tudo que você precisa
+            {t.home.featuresTitle}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-            Cada funcionalidade pensada para escalar com o seu negócio
+            {t.home.featuresSubtitle}
           </Typography>
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: { xs: 2, sm: 2.5 } }}>
-          {FEATURES.map(f => <FeatureCard key={f.title} feature={f} />)}
+          {features.map(f => <FeatureCard key={f.title} feature={f} />)}
         </Box>
       </Box>
 
       <Box sx={{ borderRadius: `${LAYOUT.borderRadius}px`, background: BRAND.gradient, p: { xs: 3, md: 5 }, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
         <Box sx={{ fontSize: 32, color: '#fff' }}><FiZap /></Box>
         <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', fontSize: { xs: '1.1rem', sm: '1.4rem' } }}>
-          Pronto para começar?
+          {t.home.ctaTitle}
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.85, maxWidth: 420, color: '#fff', fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-          Crie sua conta gratuitamente e comece a gerenciar suas campanhas hoje mesmo.
+          {t.home.ctaDescription}
         </Typography>
         <Button
           variant="contained"
           onClick={() => navigate('/register')}
           sx={{ bgcolor: '#fff', color: '#6366f1', fontWeight: 700, borderRadius: '999px', px: 4, '&:hover': { bgcolor: '#f1f5f9' } }}
         >
-          Criar Conta Grátis
+          {t.home.ctaButton}
         </Button>
       </Box>
     </Box>

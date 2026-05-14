@@ -7,20 +7,20 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { TextField, Button, Alert, Box, Typography } from '@mui/material';
 import { FiLogIn } from 'react-icons/fi';
+import { useLang } from '@/shared/hooks/useLang';
 import { BRAND } from '@/shared/constants/theme';
 
 interface LoginFormData { email: string; password: string }
 
-const schema = yup.object({
-  email:    yup.string().email('Email inválido').required('Email é obrigatório'),
-  password: yup.string().required('Senha é obrigatória'),
-}).required();
-
-const AUTH_ERROR_MESSAGE = 'Credenciais inválidas. Verifique seu email e senha.';
-
 export const LoginPage = () => {
   const [serverError, setServerError] = useState('');
   const navigate = useNavigate();
+  const { t } = useLang();
+
+  const schema = yup.object({
+    email:    yup.string().email(t.auth.emailInvalid).required(t.auth.emailRequired),
+    password: yup.string().required(t.auth.passwordRequired),
+  }).required();
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
     resolver: yupResolver(schema) as any,
@@ -33,7 +33,7 @@ export const LoginPage = () => {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/connections');
     } catch {
-      setServerError(AUTH_ERROR_MESSAGE);
+      setServerError(t.auth.loginError);
     }
   };
 
@@ -43,24 +43,24 @@ export const LoginPage = () => {
         <Box sx={{ width: 40, height: 40, borderRadius: '10px', background: BRAND.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 20, mx: 'auto', mb: 1.5 }}>
           <FiLogIn />
         </Box>
-        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.1rem' }}>Bem-vindo de volta</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 800, fontSize: '1.1rem' }}>{t.auth.loginTitle}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25, fontSize: '0.78rem' }}>
-          Entre na sua conta para continuar
+          {t.auth.loginSubtitle}
         </Typography>
       </Box>
 
       <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         {serverError && <Alert severity="error" sx={{ borderRadius: '8px', py: 0.5 }}>{serverError}</Alert>}
-        <TextField label="Email" type="email" size="small" fullWidth {...register('email')} error={!!errors.email} helperText={errors.email?.message} />
-        <TextField label="Senha" type="password" size="small" fullWidth {...register('password')} error={!!errors.password} helperText={errors.password?.message} />
+        <TextField label={t.auth.emailLabel} type="email" size="small" fullWidth {...register('email')} error={!!errors.email} helperText={errors.email?.message} />
+        <TextField label={t.auth.passwordLabel} type="password" size="small" fullWidth {...register('password')} error={!!errors.password} helperText={errors.password?.message} />
         <Button type="submit" fullWidth variant="contained" disabled={isSubmitting} sx={{ py: 1.25, mt: 0.5 }}>
-          {isSubmitting ? 'Entrando...' : 'Entrar'}
+          {isSubmitting ? t.auth.loginLoading : t.auth.loginButton}
         </Button>
       </Box>
 
       <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', fontSize: '0.78rem' }}>
-        {'Não tem uma conta? '}
-        <Link to="/register" style={{ color: 'inherit', fontWeight: 700 }}>Criar conta grátis</Link>
+        {`${t.auth.noAccount} `}
+        <Link to="/register" style={{ color: 'inherit', fontWeight: 700 }}>{t.auth.createAccountFree}</Link>
       </Typography>
     </Box>
   );

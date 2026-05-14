@@ -11,6 +11,7 @@ import {
   THEME_STORAGE_KEY,
   LAYOUT,
 } from '@/shared/constants/theme';
+import { LangProvider } from '@/shared/providers/LangProvider';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -29,6 +30,10 @@ export const ThemeModeContext = createContext<ThemeModeContextValue>({
 });
 
 const resolveInitialMode = (): ThemeMode => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTheme = urlParams.get('theme');
+  if (urlTheme === 'dark' || urlTheme === 'light') return urlTheme;
+
   const saved = localStorage.getItem(THEME_STORAGE_KEY);
   if (saved === 'dark' || saved === 'light') return saved;
   return (ENV.START_THEME as ThemeMode) || 'dark';
@@ -274,12 +279,14 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <ThemeModeContext.Provider value={colorMode}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {children}
-          </ThemeProvider>
-        </ThemeModeContext.Provider>
+        <LangProvider>
+          <ThemeModeContext.Provider value={colorMode}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              {children}
+            </ThemeProvider>
+          </ThemeModeContext.Provider>
+        </LangProvider>
       </QueryClientProvider>
     </Provider>
   );

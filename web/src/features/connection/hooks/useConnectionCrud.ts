@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createConnection, updateConnection, deleteConnection } from '@/entities/connection/api';
 import { useCurrentUser } from '@/shared/hooks/useCurrentUser';
 import { useConfirmDialog } from '@/shared/hooks/useConfirmDialog';
+import { useLang } from '@/shared/hooks/useLang';
 
 interface DialogState {
   open: boolean;
@@ -15,6 +16,7 @@ const INITIAL_DIALOG: DialogState = { open: false, editId: null, name: '' };
 export const useConnectionCrud = () => {
   const { uid } = useCurrentUser();
   const confirm = useConfirmDialog();
+  const { t } = useLang();
   const [dialog, setDialog] = useState<DialogState>(INITIAL_DIALOG);
 
   const createMut = useMutation({
@@ -65,12 +67,12 @@ export const useConnectionCrud = () => {
   const requestDelete = useCallback(
     (id: string, connName: string) => {
       confirm.requestConfirm(
-        'Excluir Conexao',
-        `Tem certeza que deseja excluir a conexao "${connName}"? Essa acao nao pode ser desfeita.`,
+        t.connections.deleteTitle,
+        t.connections.deleteMessage.replace('{name}', connName),
         () => deleteMut.mutate(id),
       );
     },
-    [confirm, deleteMut],
+    [confirm, deleteMut, t],
   );
 
   const isPending = createMut.isPending || updateMut.isPending;

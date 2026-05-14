@@ -44,16 +44,16 @@ export const ActionButtonGroup = ({ actions, columns = 2, sx }: Props) => (
   </Box>
 );
 
-export const buildEditAction = (onClick: () => void): ActionItem => ({
-  label: 'Editar',
+export const buildEditAction = (onClick: () => void, label = 'Editar'): ActionItem => ({
+  label,
   icon: <FiEdit2 size={ICON_SIZE} />,
   variant: 'outlined',
   color: 'primary',
   onClick,
 });
 
-export const buildDeleteAction = (onClick: () => void): ActionItem => ({
-  label: 'Excluir',
+export const buildDeleteAction = (onClick: () => void, label = 'Excluir'): ActionItem => ({
+  label,
   icon: <FiTrash2 size={ICON_SIZE} />,
   variant: 'outlined',
   color: 'error',
