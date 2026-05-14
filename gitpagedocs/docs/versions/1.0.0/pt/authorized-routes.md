@@ -1,55 +1,57 @@
-# Rotas autorizadas
+# Regras Firestore e Segurança
 
-Proteja rotas por chave de acesso, papeis obrigatorios e provedores externos.
+## Arquitetura Multi-Tenant
 
-## Local do config de versao
+Os dados de cada usuário são completamente isolados. As regras de segurança do Firestore garantem que:
 
-Configure em:
+- Usuários só podem acessar **suas próprias** conexões
+- Operações de contato e mensagem exigem propriedade da conexão pai
+- Todas as operações de escrita validam campos obrigatórios
 
-- `gitpagedocs/docs/versions/<versao>/config.json`
+## Modelo de Dados Firestore
 
-## Secao global auth
+```
+users/{userId}/
+├── connections/{connectionId}
+│   ├── name: string
+│   ├── status: "active" | "inactive"
+│   ├── createdAt: timestamp
+│   ├── contacts/{contactId}
+│   │   ├── name: string
+│   │   ├── phone: string
+│   │   └── createdAt: timestamp
+│   └── messages/{messageId}
+│       ├── content: string
+│       ├── status: "sent" | "scheduled"
+│       ├── scheduledAt?: timestamp
+│       └── createdAt: timestamp
+```
 
-Use `auth` no topo do config de versao:
+## Proteção de Rotas
 
-- `accessKeys`: mapa de ids de chave para segredo esperado
-- `rolesStorageKey`: chave de localStorage para bootstrap de papeis
-- `providers`: lista de provedores externos (`authjs`, `clerk`, `firebase`, `jwt`)
+### Guardas no Frontend
 
-## Autorizacao por rota
+| Guarda | Comportamento |
+|---|---|
+| `PrivateRoute` | Redireciona para `/login` se não autenticado |
+| `GuestRoute` | Redireciona para `/connections` se já autenticado |
 
-Dentro de cada rota (`routes-md`, `routes-html`, `routes-video`):
+### Rotas Protegidas
 
-- `authorization.accessKeyId`
-- `authorization.requiredRoles`
-- `authorization.requireExternalAuth`
-- `authorization.allowedProviders`
+| Rota | Guarda | Acesso |
+|---|---|---|
+| `/` | `GuestRoute` | Somente público |
+| `/login` | `GuestRoute` | Somente público |
+| `/register` | `GuestRoute` | Somente público |
+| `/connections` | `PrivateRoute` | Somente autenticado |
+| `/connections/:id/contacts` | `PrivateRoute` | Somente autenticado |
+| `/connections/:id/messages` | `PrivateRoute` | Somente autenticado |
+| `*` (404) | Nenhum | Todos |
 
-## Fases
+## Cloud Functions
 
-### Fase A - Chave de acesso
+As Cloud Functions do Firebase lidam com operações no servidor:
 
-Defina `authorization.accessKeyId` e a chave correspondente em `auth.accessKeys`.
-
-### Fase B - Papeis
-
-Defina `authorization.requiredRoles` com um ou mais papeis.
-
-Os papeis podem vir de:
-
-- query param `?authRoles=admin,maintainer`
-- localStorage (`rolesStorageKey`)
-- claims de provedores externos
-
-### Fase C - Provedores externos
-
-Defina `authorization.requireExternalAuth=true` e opcionalmente `allowedProviders`.
-
-Adaptadores suportados:
-
-- Auth.js (`type: "authjs"`)
-- Clerk (`type: "clerk"`)
-- Firebase Auth (`type: "firebase"`)
-- JWT custom (`type: "jwt"`)
-
-> Versao: 1.0.0
+- **Agendamento de mensagens** com triggers do Firestore
+- **Operações em lote** para envio em massa
+- Validação e sanitização de dados na camada backend

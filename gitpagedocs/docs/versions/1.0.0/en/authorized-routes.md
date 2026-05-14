@@ -1,87 +1,57 @@
-# Authorized Routes
+# Firestore Rules & Security
 
-Protect routes by access key, required roles, and external authentication providers.
+## Multi-Tenant Architecture
 
-## Version config location
+Each user's data is completely isolated. The Firestore security rules ensure that:
 
-Configure this at:
+- Users can only access **their own** connections
+- Contact and message operations require ownership of the parent connection
+- All write operations validate required fields
 
-- `gitpagedocs/docs/versions/<version>/config.json`
+## Firestore Data Model
 
-## Global auth section
-
-Use top-level `auth` in version config:
-
-- `accessKeys`: map of key ids to expected secrets
-- `rolesStorageKey`: localStorage key for role bootstrap
-- `providers`: external providers list (`authjs`, `clerk`, `firebase`, `jwt`)
-
-## Route-level authorization
-
-Inside each route (`routes-md`, `routes-html`, `routes-video`):
-
-- `authorization.accessKeyId`
-- `authorization.requiredRoles`
-- `authorization.requireExternalAuth`
-- `authorization.allowedProviders`
-
-## Phases
-
-### Phase A - Access key
-
-Set `authorization.accessKeyId` and define that key in `auth.accessKeys`.
-
-### Phase B - Roles
-
-Set `authorization.requiredRoles` with one or more roles.
-
-Roles can come from:
-
-- query param `?authRoles=admin,maintainer`
-- localStorage (`rolesStorageKey`)
-- external provider claims
-
-### Phase C - External providers
-
-Set `authorization.requireExternalAuth=true` and optionally `allowedProviders`.
-
-Supported adapters:
-
-- Auth.js (`type: "authjs"`)
-- Clerk (`type: "clerk"`)
-- Firebase Auth (`type: "firebase"`)
-- Custom JWT (`type: "jwt"`)
-
-## Example
-
-```json
-{
-  "auth": {
-    "accessKeys": {
-      "docs-key": "open-gitpagedocs-docs"
-    },
-    "providers": [
-      { "type": "authjs", "enabled": true, "sessionEndpoint": "/api/auth/session" },
-      { "type": "jwt", "enabled": true, "tokenStorageKey": "git-page-docs:jwt-token" }
-    ]
-  },
-  "routes-md": [
-    {
-      "id": 6,
-      "path": {
-        "en": "gitpagedocs/docs/versions/1.1.1/en/authorized-routes.md",
-        "pt": "gitpagedocs/docs/versions/1.1.1/pt/authorized-routes.md",
-        "es": "gitpagedocs/docs/versions/1.1.1/es/authorized-routes.md"
-      },
-      "authorization": {
-        "accessKeyId": "docs-key",
-        "requiredRoles": ["maintainer"],
-        "requireExternalAuth": true,
-        "allowedProviders": ["authjs", "jwt"]
-      }
-    }
-  ]
-}
+```
+users/{userId}/
+├── connections/{connectionId}
+│   ├── name: string
+│   ├── status: "active" | "inactive"
+│   ├── createdAt: timestamp
+│   ├── contacts/{contactId}
+│   │   ├── name: string
+│   │   ├── phone: string
+│   │   └── createdAt: timestamp
+│   └── messages/{messageId}
+│       ├── content: string
+│       ├── status: "sent" | "scheduled"
+│       ├── scheduledAt?: timestamp
+│       └── createdAt: timestamp
 ```
 
-> Version: 1.0.0
+## Route Protection
+
+### Frontend Guards
+
+| Guard | Behavior |
+|---|---|
+| `PrivateRoute` | Redirects to `/login` if not authenticated |
+| `GuestRoute` | Redirects to `/connections` if already authenticated |
+
+### Protected Routes
+
+| Route | Guard | Access |
+|---|---|---|
+| `/` | `GuestRoute` | Public only |
+| `/login` | `GuestRoute` | Public only |
+| `/register` | `GuestRoute` | Public only |
+| `/connections` | `PrivateRoute` | Authenticated only |
+| `/connections/:id/contacts` | `PrivateRoute` | Authenticated only |
+| `/connections/:id/messages` | `PrivateRoute` | Authenticated only |
+| `*` (404) | None | Everyone |
+
+## Cloud Functions
+
+Firebase Cloud Functions handle server-side operations:
+
+- **Message scheduling** with Firestore triggers
+- **Batch operations** for mass message delivery
+- Data validation and sanitization at the backend layer

@@ -1,34 +1,29 @@
-# Git Page Docs
+# Firebase SaaS Auth
 
-Git Page Docs e um runtime de documentacao multi-idioma para repositorios que possuem a pasta `gitpagedocs/`.
+## BroadcastApp
 
-## O que este projeto entrega
+Uma plataforma **SaaS de Disparos em Massa** completa construída com React, TypeScript, MUI e Firebase.
 
-- Renderizacao markdown em varios idiomas (`en`, `pt`, `es`)
-- Roteamento por versao (`/v/:versao`)
-- Sistema de temas por templates JSON
-- Execucao local e em GitHub Pages
-- Busca de repositorio + renderizacao remota opcional
+### Demo Online
 
-## Contrato de pastas
+[https://fir-saas-auth-4a138.web.app/](https://fir-saas-auth-4a138.web.app/)
 
-O runtime espera esta estrutura:
+### Principais Funcionalidades
 
-- `gitpagedocs/config.json`
-- `gitpagedocs/docs/<lang>/*.md`
-- `gitpagedocs/docs/versions/<versao>/config.json`
-- `gitpagedocs/docs/versions/<versao>/<lang>/*.md`
-- `gitpagedocs/layouts/layoutsConfig.json`
-- `gitpagedocs/layouts/templates/*.json`
+- **Autenticação** — Login, cadastro e gerenciamento de senha com Firebase Auth
+- **Conexões** — Crie espaços de trabalho isolados para gerenciar contatos e mensagens
+- **Contatos** — Gerencie contatos com nome e telefone por conexão
+- **Mensagens** — Envie e agende mensagens em massa para contatos
+- **i18n** — Suporte completo para Português, Inglês e Espanhol
+- **Temas** — Modo Escuro e Claro com sincronização por parâmetro de URL
+- **Guardas de Rota** — `PrivateRoute` e `GuestRoute` para controle de acesso
+- **Responsivo** — Design mobile-first com padrão de navegação unificado
+- **FSD** — Arquitetura Feature-Sliced Design para separação limpa de responsabilidades
 
-## Navegacao rapida
+### Stack Tecnológica
 
-- Abra **Primeiros passos** para setup local.
-- Abra **Configuracao** para detalhes completos do `config.json`.
-- Abra **Publicacao** para comportamento local/producao/GitHub Pages.
-- Abra **Arquitetura** para mapa de codigo e fluxo de dados.
-- Abra **Temas e layouts** para autoria de templates.
-- Abra **Rotas autorizadas** para configurar chave, papeis e autenticacao externa.
-- Abra **FAQ** para troubleshooting.
+`React 19` · `TypeScript` · `Vite` · `MUI v6` · `Redux Toolkit` · `Firebase Auth` · `Cloud Firestore` · `Cloud Functions`
 
-> Versao: 1.0.0
+### Repositório
+
+[github.com/Vidigal-code/firebase-saas-auth](https://github.com/Vidigal-code/firebase-saas-auth)

@@ -1,68 +1,61 @@
 # Funcionalidades
 
-Referencia completa de opciones CLI, claves de configuracion y funciones del runtime.
+## Autenticación
 
-## Comandos CLI
+- **Login** con email y contraseña vía Firebase Auth
+- **Registro** con validación de contraseña fuerte (mín. 8 caracteres, mayúscula, minúscula, número, especial)
+- **Cambio de contraseña** vía diálogo en el dashboard
+- **Guardias de ruta**: `PrivateRoute` bloquea acceso no autenticado, `GuestRoute` redirige usuarios conectados fuera de las páginas públicas
 
-| Comando | Descripcion |
-|---------|-------------|
-| `npx gitpagedocs` | Genera config y docs en `gitpagedocs/` |
-| `npx gitpagedocs --layoutconfig` | Tambien genera layouts/templates locales |
-| `npx gitpagedocs --home` | Distribucion standalone (`gitpagedocshome/`) |
-| `npx gitpagedocs --push --owner X --repo Y` | Configura workflow, commit, push |
-| `npx gitpagedocs --interactive` / `-i` | Modo interactivo con prompts |
+## Gestión de Conexiones
 
-## Opciones CLI
+- **Crear** conexiones nombradas (espacios de trabajo aislados)
+- **Editar** nombre de la conexión
+- **Eliminar** con diálogo de confirmación
+- Cada conexión es un silo multi-tenant — los usuarios solo ven sus propios datos
 
-| Opcion | Descripcion |
-|--------|-------------|
-| `--owner <user>` | Owner de GitHub |
-| `--repo <repo>` | Repositorio GitHub |
-| `--path <subpath>` | Subruta de docs (ej: `docs`); sin ella, base path = nombre del repo para CSS/JS en project sites |
-| `--output <dir>` | Directorio de salida (default: `gitpagedocs`) |
-| `--search true|false` | Habilita/deshabilita busqueda de repositorio (`--home`) |
-| `--layoutconfig` | Genera `gitpagedocs/layouts/` |
-| `--push` | Crea workflow, commit de artefactos, push |
-| `--home` | Genera `gitpagedocshome/` (estatico + .env + Dockerfile) |
+## Gestión de Contactos
 
-## Salida generada
+- **Agregar contactos** con nombre y teléfono por conexión
+- **Editar** y **eliminar** contactos
+- Listado paginado con listeners en tiempo real de Firestore
 
-- `gitpagedocs/config.json` – config raiz
-- `gitpagedocs/icon.svg` – icono por defecto
-- `gitpagedocs/docs/versions/<ver>/config.json` – rutas por version
-- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/*.md` – docs en markdown
-- `gitpagedocs/docs/versions/<ver>/{en,pt,es}/source-viewer` – visor de codigo (estilo GitHub)
-- `gitpagedocs/layouts/` – solo con `--layoutconfig`
+## Mensajes y Envíos Masivos
 
-## Tipos de contenido
+- **Enviar mensajes** a múltiples contactos simultáneamente
+- **Programar mensajes** para envío futuro
+- **Pestañas**: Todos, Enviados, Programados
+- Seguimiento de estado en tiempo real por mensaje
 
-| Tipo | Clave config | Descripcion |
-|------|--------------|-------------|
-| Markdown | `routes-md` | Archivos .md con `path` por idioma |
-| HTML | `routes-html` | `path` (ej: source-viewer) o `url` externa |
-| Video | `routes-video` | `video.pathVideo`, `video.videoType` |
-| Audio | `routes-audio` | `audio.pathAudio`, `audio.audioType` |
+## Internacionalización (i18n)
 
-## Visor de codigo fuente
+- **3 idiomas**: Portugués (PT), Inglés (EN), Español (ES)
+- Sistema de traducción basado en JSON en `src/shared/langs/`
+- `LangProvider` con sincronización por parámetro de URL (`?lang=pt`)
+- Persistencia en `localStorage` con fallback a `VITE_START_LANG`
+- Componente `LangSelector` para cambio en tiempo de ejecución
 
-La CLI genera una pagina **Codigo fuente** por version. Escanea `src/`, `cli/` y archivos raiz (README.md, package.json, next.config.ts, etc.) y construye un visor estilo GitHub en modo oscuro con:
+## Temas
 
-- Arbol de archivos en barra lateral con expandir/colapsar carpetas
-- Filtro de busqueda
-- Resaltado de sintaxis (TypeScript, JavaScript, JSON, CSS, Markdown)
-- Boton copiar, numeros de linea
-- Alternar vista previa/codigo del README.md
-- Controles Expandir todo / Colapsar todo
+- Soporte para modo **Oscuro** y **Claro**
+- Componente `ThemeToggleButton`
+- Persistencia vía `localStorage` con fallback a `VITE_START_THEME`
+- Sincronización por parámetro de URL (`?theme=dark`)
 
-## Claves de config (site)
+## Seguridad
 
-- `name`, `defaultLanguage`, `supportedLanguages`
-- `docsVersion`, `rendering`, `ThemeDefault`, `ThemeModeDefault`
-- `ProjectLink`, `layoutsConfigPathOficial`, `layoutsConfigPath`
+- **Firestore Rules** imponen aislamiento multi-tenant vía validación de `clientId`
+- Cada usuario solo puede leer/escribir sus propias conexiones, contactos y mensajes
+- Política de contraseña fuerte aplicada en el registro
 
-## Variables de entorno
+## Componentes Reutilizables
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH` – busqueda de repositorio (local)
-- `GITHUB_ACTIONS` – modo build GitHub Pages
-
-> Version (ES): 1.0.0
+| Componente | Propósito |
+|---|---|
+| `LangSelector` | Dropdown de selección de idioma |
+| `ThemeToggleButton` | Toggle modo oscuro/claro |
+| `LangThemeBar` | Layout grid combinado lang + tema |
+| `ActionButtonGroup` | Grid de botones configurable |
+| `ConfirmDialog` | Confirmación de eliminación reutilizable |
+| `PageHeader` | Encabezado estandarizado con ícono y subtítulo |
+| `BrandLogo` | Logo del app con tamaños configurables |

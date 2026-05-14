@@ -1,34 +1,29 @@
-# Git Page Docs
+# Firebase SaaS Auth
 
-Git Page Docs is a multilingual documentation runtime for repositories that ship a `gitpagedocs/` folder.
+## BroadcastApp
 
-## What this project delivers
+A complete **SaaS Broadcast Platform** built with React, TypeScript, MUI, and Firebase.
 
-- Multilingual markdown rendering (`en`, `pt`, `es`)
-- Version-aware docs routing (`/v/:version`)
-- Theme system with JSON templates
-- Local and GitHub Pages execution modes
-- Optional repository search + remote rendering
+### Live Demo
 
-## Folder contract
+[https://fir-saas-auth-4a138.web.app/](https://fir-saas-auth-4a138.web.app/)
 
-The runtime expects this structure:
+### Key Features
 
-- `gitpagedocs/config.json`
-- `gitpagedocs/docs/<lang>/*.md`
-- `gitpagedocs/docs/versions/<version>/config.json`
-- `gitpagedocs/docs/versions/<version>/<lang>/*.md`
-- `gitpagedocs/layouts/layoutsConfig.json`
-- `gitpagedocs/layouts/templates/*.json`
+- **Authentication** — Login, registration, and password management with Firebase Auth
+- **Connections** — Create isolated workspaces for managing contacts and messages
+- **Contacts** — Manage contacts with name and phone number per connection
+- **Messages** — Send and schedule mass messages to contacts
+- **i18n** — Full support for Portuguese, English, and Spanish
+- **Theming** — Dark and Light mode with URL parameter sync
+- **Route Guards** — `PrivateRoute` and `GuestRoute` for access control
+- **Responsive** — Mobile-first design with unified navigation pattern
+- **FSD** — Feature-Sliced Design architecture for clean separation of concerns
 
-## Quick navigation
+### Tech Stack
 
-- Open **Getting Started** for local setup.
-- Open **Configuration** for full `config.json` explanation.
-- Open **Deployment** for local, server, and GitHub Pages behavior.
-- Open **Architecture** for code map and data flow.
-- Open **Themes and layouts** for template authoring details.
-- Open **Authorized routes** for key, roles, and external auth setup.
-- Open **FAQ** for troubleshooting.
+`React 19` · `TypeScript` · `Vite` · `MUI v6` · `Redux Toolkit` · `Firebase Auth` · `Cloud Firestore` · `Cloud Functions`
 
-> Version: 1.0.0
+### Repository
+
+[github.com/Vidigal-code/firebase-saas-auth](https://github.com/Vidigal-code/firebase-saas-auth)

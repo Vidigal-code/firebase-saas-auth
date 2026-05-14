@@ -1,45 +1,59 @@
 # Getting Started
 
-This guide configures your repository from zero to running docs.
-
 ## Prerequisites
 
-- Node.js 20+
-- npm 10+
+- **Node.js** v18+
+- **npm** v9+
+- **Firebase CLI** installed globally
+- A **Firebase** project with Authentication and Firestore enabled
 
-## Install and generate
+## Installation
 
-1. Install package:
-   - `npm install gitpagedocs`
-2. Generate docs config and versions:
-   - `npx gitpagedocs`
-3. Optional: generate local layouts/templates:
-   - `npx gitpagedocs --layoutconfig`
+```bash
+git clone https://github.com/Vidigal-code/firebase-saas-auth.git
+cd firebase-saas-auth
+```
 
-## Local run
+### Web (Frontend)
 
-1. Development:
-   - `npm run dev`
-2. Production locally:
-   - `npm run build`
-   - `npm start`
+```bash
+cd web
+npm install
+cp envexample.txt .env
+```
 
-## CLI behavior
+Edit `.env` with your Firebase credentials:
 
-`npx gitpagedocs` generates only artifacts in `gitpagedocs/`:
+```env
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+VITE_START_LANG=pt
+VITE_START_THEME=dark
+```
 
-- JSON + markdown docs assets
-- No `index.html`
-- No `index.js`
-- No install command execution
+### Cloud Functions (Backend)
 
-## Repository search mode
+```bash
+cd functions
+npm install
+```
 
-Local repository search is controlled by:
+## Running Locally
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
-- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
+```bash
+cd web
+npm run dev
+```
 
-On GitHub Pages builds (`GITHUB_ACTIONS=true`), repository-search home is enabled.
+The application will be available at `http://localhost:5173`.
 
-> Version: 1.0.0
+## Deploy to Firebase
+
+```bash
+npm run build
+npx firebase-tools deploy --only firestore,hosting
+```

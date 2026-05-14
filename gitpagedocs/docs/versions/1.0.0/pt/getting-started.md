@@ -1,40 +1,59 @@
-# Primeiros passos
+# Primeiros Passos
 
-Este guia leva o projeto do zero ate docs rodando.
+## Pré-requisitos
 
-## Pre-requisitos
+- **Node.js** v18+
+- **npm** v9+
+- **Firebase CLI** instalado globalmente
+- Um projeto **Firebase** com Authentication e Firestore habilitados
 
-- Node.js 20+
-- npm 10+ (ou pnpm)
+## Instalação
 
-## Setup local
+```bash
+git clone https://github.com/Vidigal-code/firebase-saas-auth.git
+cd firebase-saas-auth
+```
 
-1. Instale dependencias:
-   - `npm install`
-2. Gere/atualize os artefatos de docs:
-   - `npm run gitpagedocs`
-3. Inicie o desenvolvimento:
-   - `npm run dev`
-4. Build e execucao local de producao:
-   - `npm run build`
-   - `npm start`
+### Web (Frontend)
 
-## Comportamento da CLI
+```bash
+cd web
+npm install
+cp envexample.txt .env
+```
 
-`npx gitpagedocs` (ou `npm run gitpagedocs`) gera os artefatos na pasta oficial `gitpagedocs/`.
+Edite o `.env` com suas credenciais Firebase:
 
-- Gera somente markdown/json
-- Nao gera `index.html`
-- Nao gera `index.js`
-- Nao executa comandos de instalacao
+```env
+VITE_FIREBASE_API_KEY=sua-api-key
+VITE_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=seu-project-id
+VITE_FIREBASE_STORAGE_BUCKET=seu-projeto.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=seu-sender-id
+VITE_FIREBASE_APP_ID=seu-app-id
+VITE_START_LANG=pt
+VITE_START_THEME=dark
+```
 
-## Modo de busca por repositorio
+### Cloud Functions (Backend)
 
-No ambiente local, o controle e por variavel:
+```bash
+cd functions
+npm install
+```
 
-- `GITPAGEDOCS_REPOSITORY_SEARCH=true`
-- `GITPAGEDOCS_REPOSITORY_SEARCH=false`
+## Executando Localmente
 
-Em build de GitHub Pages (`GITHUB_ACTIONS=true`), a busca de repositorio fica sempre ativa.
+```bash
+cd web
+npm run dev
+```
 
-> Versao: 1.0.0
+A aplicação estará disponível em `http://localhost:5173`.
+
+## Deploy no Firebase
+
+```bash
+npm run build
+npx firebase-tools deploy --only firestore,hosting
+```

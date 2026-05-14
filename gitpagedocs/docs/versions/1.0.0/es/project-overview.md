@@ -1,16 +1,39 @@
-# Vision general del proyecto
+# Visión General del Proyecto
 
-Git Page Docs esta impulsado por Next.js 15, React 19, TypeScript y Node.js. Genera documentacion multilingue para GitHub Pages.
+## BroadcastApp — Firebase SaaS Auth
 
-## Stack
+Una plataforma SaaS completa para gestión de comunicación masiva construida con **React**, **TypeScript**, **MUI** y **Firebase**.
 
-- Next.js 15
-- React 19
-- TypeScript
-- Node.js 20+
+## Stack Tecnológico
 
-## Objetivo
+| Capa | Tecnología |
+|---|---|
+| **Frontend** | React 19 + TypeScript + Vite |
+| **UI** | Material UI (MUI) v6 |
+| **Estado** | Redux Toolkit |
+| **Autenticación** | Firebase Authentication |
+| **Base de Datos** | Cloud Firestore (Realtime) |
+| **Backend** | Firebase Cloud Functions |
+| **Hosting** | Firebase Hosting |
+| **Arquitectura** | Feature-Sliced Design (FSD) |
+| **i18n** | JSON personalizado (PT/EN/ES) |
 
-Construir documentacion multilingue para repositorios GitHub con soporte para versiones, temas y contenido md/html/video.
+## Estructura del Proyecto (FSD)
 
-> Version (ES): 1.0.0
+```
+web/src/
+├── app/          → Providers, Router, Store
+├── pages/        → LoginPage, RegisterPage, ConnectionsPage, ...
+├── widgets/      → PublicLayout, DashboardLayout, AppHeader, AppSidebar
+├── features/     → Auth, Connection, Contact, Message CRUD
+├── entities/     → ConnectionCard, ContactCard, MessageCard
+└── shared/       → Hooks, Componentes UI, Config, Constantes, Langs
+```
+
+## Principios Clave
+
+- **SOLID** — Responsabilidad única, abierto a extensión
+- **Clean Code** — Sin comentarios, funciones pequeñas, sin hardcodes
+- **FSD** — Aislamiento estricto de capas (shared → entities → features → widgets → pages → app)
+- **Multi-tenant** — Aislamiento de datos por usuario vía Firestore Rules
+- **100% Responsivo** — Mobile-first con patrón unificado de drawer

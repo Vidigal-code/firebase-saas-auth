@@ -1,19 +1,31 @@
-# Introduction to Git
+# Architecture
 
-Basic Git concepts for beginners.
+## Feature-Sliced Design (FSD)
 
-## Key concepts
+The application follows the **Feature-Sliced Design** methodology, ensuring strict layer isolation and maximum code reusability.
 
-- **Repository**: A project folder tracked by Git
-- **Commit**: A snapshot of changes
-- **Branch**: Alternative line of development
-- **Remote**: Shared repository (e.g. on GitHub)
+### Layer Hierarchy
 
-## Common commands
+```
+app → pages → widgets → features → entities → shared
+```
 
-- `git init` - Initialize a repo
-- `git add` - Stage changes
-- `git commit` - Create a snapshot
-- `git push` - Send to remote
+Each layer can only import from layers below it. This ensures unidirectional dependency flow.
 
-> Version: 1.0.0
+### Layers Explained
+
+| Layer | Responsibility | Examples |
+|---|---|---|
+| `app` | Global setup, providers, router, store | `ThemeProvider`, `LangProvider`, `router` |
+| `pages` | Full page compositions | `ConnectionsPage`, `LoginPage`, `NotFoundPage` |
+| `widgets` | Complex UI blocks, layouts | `PublicLayout`, `DashboardLayout`, `AppSidebar` |
+| `features` | Business logic + UI for user actions | `useConnectionCrud`, `ConnectionDialog` |
+| `entities` | Domain models + display components | `ConnectionCard`, `ContactCard` |
+| `shared` | Reusable utilities, UI, hooks, config | `useLang`, `LangSelector`, `ConfirmDialog` |
+
+### State Management
+
+- **Redux Toolkit** for global auth state (`user` slice)
+- **React Context** for theme mode (`ThemeModeContext`)
+- **React Context** for language (`LangContext`)
+- **Local state** (`useState`) for UI-specific logic (dialogs, menus)

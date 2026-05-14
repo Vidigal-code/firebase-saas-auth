@@ -1,12 +1,31 @@
-# Introducao ao Git
+# Arquitetura
 
-Conceitos basicos de Git para iniciantes.
+## Feature-Sliced Design (FSD)
 
-## Comandos essenciais
+A aplicação segue a metodologia **Feature-Sliced Design**, garantindo isolamento estrito de camadas e máxima reutilização de código.
 
-- `git init` - iniciar repositorio
-- `git add` - preparar alteracoes
-- `git commit` - registrar commit
-- `git push` - enviar para remoto
+### Hierarquia de Camadas
 
-> Versao: 1.0.0
+```
+app → pages → widgets → features → entities → shared
+```
+
+Cada camada só pode importar de camadas abaixo dela. Isso garante fluxo de dependência unidirecional.
+
+### Camadas Explicadas
+
+| Camada | Responsabilidade | Exemplos |
+|---|---|---|
+| `app` | Setup global, providers, router, store | `ThemeProvider`, `LangProvider`, `router` |
+| `pages` | Composições de página completa | `ConnectionsPage`, `LoginPage`, `NotFoundPage` |
+| `widgets` | Blocos de UI complexos, layouts | `PublicLayout`, `DashboardLayout`, `AppSidebar` |
+| `features` | Lógica de negócio + UI para ações do usuário | `useConnectionCrud`, `ConnectionDialog` |
+| `entities` | Modelos de domínio + componentes de exibição | `ConnectionCard`, `ContactCard` |
+| `shared` | Utilitários reutilizáveis, UI, hooks, config | `useLang`, `LangSelector`, `ConfirmDialog` |
+
+### Gerenciamento de Estado
+
+- **Redux Toolkit** para estado global de autenticação (slice `user`)
+- **React Context** para modo de tema (`ThemeModeContext`)
+- **React Context** para idioma (`LangContext`)
+- **Estado local** (`useState`) para lógica específica de UI (dialogs, menus)
