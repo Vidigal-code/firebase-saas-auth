@@ -238,8 +238,10 @@
       "RouteguideBrandContainerTop": false
     }
   ],
+  "routes-source-viewer": [],
   "routes-html": [],
   "routes-video": [],
+  "routes-audio": [],
   "menus-header-md": [
     {
       "id": 1,
@@ -332,18 +334,22 @@
       }
     }
   ],
+  "menus-header-source-viewer": [],
   "menus-header-html": [],
   "menus-header-video": [],
+  "menus-header-audio": [],
   "hierarchyPage": {
     "md": 0,
     "html": 1,
     "video": 2,
-    "audio": 3
+    "audio": 3,
+    "source-viewer": 4
   },
   "hierarchyMenu": {
     "md": 0,
     "html": 1,
     "video": 2,
-    "audio": 3
+    "audio": 3,
+    "source-viewer": 4
   }
 }
