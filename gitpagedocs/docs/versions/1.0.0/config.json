@@ -257,6 +257,43 @@
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
       "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 7,
+      "title": {
+        "pt": "Plano Blaze",
+        "en": "Blaze Plan",
+        "es": "Plan Blaze"
+      },
+      "description": {
+        "pt": "O que é, quanto custa e como ativar as Cloud Functions",
+        "en": "What it is, how much it costs and how to enable Cloud Functions",
+        "es": "Qué es, cuánto cuesta y cómo activar las Cloud Functions"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/blaze-plan.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/blaze-plan.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/blaze-plan.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
     }
   ],
   "routes-source-viewer": [],
@@ -352,6 +389,21 @@
       "es": {
         "title": "Reglas Firestore y seguridad",
         "path-click": "gitpagedocs/docs/versions/1.0.0/es/authorized-routes.md"
+      }
+    },
+    {
+      "id": 7,
+      "pt": {
+        "title": "Plano Blaze",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/blaze-plan.md"
+      },
+      "en": {
+        "title": "Blaze Plan",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/blaze-plan.md"
+      },
+      "es": {
+        "title": "Plan Blaze",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/blaze-plan.md"
       }
     }
   ],

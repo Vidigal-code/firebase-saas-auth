@@ -9,6 +9,58 @@
 
 **App publicado:** [https://fir-saas-auth-4a138.web.app](https://fir-saas-auth-4a138.web.app) · **Docs:** [gitpagedocs](https://vidigal-code.github.io/firebase-saas-auth/)
 
+## 💳 Plano Blaze do Firebase
+
+> **Resumo:** o app está publicado e funcionando, mas a mudança automática de **"Agendada" para "Enviada"** depende de Cloud Functions, e o Firebase só publica Cloud Functions no plano **Blaze**. O código está pronto e testado e fica desligado pela flag `VITE_SCHEDULED_DISPATCH_ENABLED=false` até o upgrade.
+
+### O que é
+
+O Firebase tem dois planos:
+
+| | **Spark** (atual) | **Blaze** |
+|---|---|---|
+| Preço | Gratuito | Pague pelo que usar |
+| Cotas gratuitas | Sim | **As mesmas do Spark**; só cobra o que passar delas |
+| Cartão de crédito | Não precisa | Precisa de uma conta de faturamento |
+| Hosting, Auth, Firestore | ✅ | ✅ |
+| **Cloud Functions** | ❌ não permite publicar | ✅ |
+| Cloud Scheduler (agenda da função) | ❌ | ✅ |
+
+Ou seja, o Blaze não é um plano pago fixo: é o mesmo plano gratuito com a opção de cobrar o excedente, e é ele que libera as Cloud Functions.
+
+### Por que este projeto precisa dele
+
+O desafio exige que a mensagem agendada mude para "Enviada" **no backend, com Cloud Functions, sem depender do app aberto**. Isso é feito pela função `dispatchScheduledMessages`, que roda a cada minuto. As funções `cleanupDeletedConnection` e `detachDeletedContact`, que fazem a limpeza em cascata, também precisam do Blaze.
+
+### Quanto custa
+
+Para o uso deste app, o custo esperado é **zero**: tudo fica bem abaixo das cotas gratuitas mensais. Os valores vêm de [firebase.google.com/pricing](https://firebase.google.com/pricing); confira antes de ativar, porque eles podem mudar.
+
+| Recurso | Uso estimado do app | Gratuito por mês |
+|---|---|---|
+| Invocações de Cloud Functions | ~44 mil (agendador a cada 1 minuto) | 2 milhões |
+| Tempo de execução das Functions | poucos milhares de GB-s | 400 mil GB-s |
+| Imagens das Functions (Artifact Registry) | algumas centenas de MB | 500 MB |
+| Cloud Scheduler | 1 job | 3 jobs por conta de faturamento |
+| Firestore | uso de teste | 50 mil leituras e 20 mil gravações por dia |
+| Hosting | ~1,5 MB por visita | 360 MB/dia de tráfego |
+
+O item com mais chance de passar da cota é o armazenamento das imagens das funções (Artifact Registry), e mesmo assim seriam centavos. Contas novas do Google Cloud costumam receber crédito promocional no upgrade.
+
+### Como ativar (passo a passo)
+
+1. Abra https://console.firebase.google.com/project/fir-saas-auth-4a138/usage/details e confira, no topo, que o projeto é **firebase-saas-auth (fir-saas-auth-4a138)**.
+2. Clique em **Modify plan** (Modificar plano), escolha **Blaze** e vincule ou crie uma conta de faturamento.
+3. Se continuar aparecendo Spark, verifique se a conta de faturamento está vinculada ao projeto: https://console.cloud.google.com/billing/linkedaccount?project=fir-saas-auth-4a138.
+4. Ligue a flag: `VITE_SCHEDULED_DISPATCH_ENABLED="true"` em `web/.env` e no repositório (`gh variable set VITE_SCHEDULED_DISPATCH_ENABLED --body true`).
+5. Publique: `npm run deploy:functions && npm run deploy`.
+
+### Como evitar surpresas na fatura
+
+- Crie um **alerta de orçamento** em https://console.cloud.google.com/billing/budgets (por exemplo, US$ 1). Você recebe um e-mail se aparecer qualquer custo.
+- O alerta só avisa, não bloqueia a cobrança.
+- Para voltar ao gratuito: desligue a flag, remova as funções (`npx firebase functions:delete dispatchScheduledMessages cleanupDeletedConnection detachDeletedContact`) e rebaixe o projeto para Spark. Hosting, Auth e Firestore continuam funcionando.
+
 ## 🇧🇷 Português
 
 <details open>
@@ -53,22 +105,7 @@ A funcionalidade fica atrás da flag `VITE_SCHEDULED_DISPATCH_ENABLED`, hoje **`
 
 As funções de limpeza em cascata (`cleanupDeletedConnection` e `detachDeletedContact`) também são Cloud Functions e seguem a mesma regra. Sem elas, excluir uma conexão não apaga automaticamente os contatos e as mensagens dela. Esses dados continuam isolados pelas regras e só o próprio cliente os vê.
 
-#### O que é o plano Blaze e quanto custa
-
-O **Blaze** é o plano "pague pelo que usar" do Firebase. Ele **mantém as mesmas cotas gratuitas do plano Spark** e só cobra o que passar delas, mas exige uma conta de faturamento (cartão de crédito). Contas novas costumam receber crédito promocional ao fazer o upgrade.
-
-Para este app, o custo esperado é **zero**, porque o uso fica bem abaixo das cotas gratuitas mensais (valores de [firebase.google.com/pricing](https://firebase.google.com/pricing); confira antes de ativar, eles podem mudar):
-
-| Recurso | Uso estimado | Gratuito por mês |
-|---|---|---|
-| Invocações de Cloud Functions | ~44 mil (agendador a cada 1 minuto) | 2 milhões |
-| Tempo de execução das Functions | poucos milhares de GB-s | 400 mil GB-s |
-| Imagens das Functions (Artifact Registry) | algumas centenas de MB | 500 MB |
-| Cloud Scheduler | 1 job | 3 jobs por conta de faturamento |
-| Firestore | uso de teste | 50 mil leituras e 20 mil gravações por dia |
-| Hosting | ~1,5 MB por visita | 360 MB/dia de tráfego |
-
-Recomendação: crie um alerta de orçamento em https://console.cloud.google.com/billing/budgets (por exemplo, US$ 1) para ser avisado por e-mail se aparecer algum custo.
+Veja [Plano Blaze do Firebase](#-plano-blaze-do-firebase) para entender o plano, o custo e o passo a passo.
 
 **Como ativar:**
 1. Ative o plano Blaze em https://console.firebase.google.com/project/fir-saas-auth-4a138/usage/details.

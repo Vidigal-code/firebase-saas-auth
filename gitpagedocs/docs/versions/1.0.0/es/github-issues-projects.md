@@ -42,4 +42,4 @@ Los pull requests ejecutan solo el job de calidad.
 
 Publicar Cloud Functions requiere el plan **Blaze** (pago por uso) de Firebase. Mantiene las cuotas gratuitas del plan Spark y solo cobra el excedente, pero exige una cuenta de facturación (tarjeta). Para el uso de esta app (~44 mil invocaciones al mes frente a 2 millones gratuitas, 1 job de Cloud Scheduler frente a 3 gratuitos, algunos cientos de MB de imágenes frente a 500 MB gratuitos) el costo esperado es cero. Crea una alerta de presupuesto en Google Cloud para recibir aviso de cualquier costo.
 
-Mientras el proyecto esté en Spark, la flag `VITE_SCHEDULED_DISPATCH_ENABLED` queda en `false`: las Functions están implementadas y probadas, pero no se publican, y la app avisa que el envío automático está inactivo. Para activarla: haz el upgrade en `console.firebase.google.com/project/<proyecto>/usage/details`, cambia la flag a `true` y ejecuta `npm run deploy:functions`.
+Explicación completa (qué es, costo y cómo activarlo) en la página **Plan Blaze**.
