@@ -68,17 +68,16 @@ jobs:
       - name: Build
         run: npm run build
 
-  deploy:
-    name: Deploy to Firebase
-    needs: quality
+  # Deploy is opt-in: without the service account secret the deploy job does not run
+  # (no failed run, no empty production deployment); adding the secret enables it.
+  deploy-credentials:
+    name: Check deploy credentials
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    environment: production
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
     steps:
-      # Deploy is opt-in: without the service account secret the job is skipped with a
-      # warning, so forks and unconfigured repositories still get a green quality run.
-      - name: Check deploy credentials
-        id: credentials
+      - id: check
         env:
           SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
@@ -86,14 +85,19 @@ jobs:
             echo "configured=true" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Deploy skipped: add the FIREBASE_SERVICE_ACCOUNT secret (Settings > Secrets and variables > Actions) to enable it. See README, Deploy automático."
+            echo "::notice::Deploy disabled: add the FIREBASE_SERVICE_ACCOUNT secret (Settings > Secrets and variables > Actions) to enable it. See README, Deploy automático."
           fi
 
+  deploy:
+    name: Deploy to Firebase
+    needs: [quality, deploy-credentials]
+    if: needs.deploy-credentials.outputs.configured == 'true'
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
       - uses: actions/checkout@v7
-        if: steps.credentials.outputs.configured == 'true'
 
       - uses: actions/setup-node@v7
-        if: steps.credentials.outputs.configured == 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -103,20 +107,17 @@ jobs:
             web/package-lock.json
 
       - name: Install dependencies
-        if: steps.credentials.outputs.configured == 'true'
         run: |
           npm ci
           npm ci --prefix functions
           npm ci --prefix web
 
       - name: Authenticate to Google Cloud
-        if: steps.credentials.outputs.configured == 'true'
         uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
       - name: Deploy Firestore rules and indexes, Cloud Functions and Hosting
-        if: steps.credentials.outputs.configured == 'true'
         run: >
           npx firebase deploy
           --only firestore,functions,hosting
