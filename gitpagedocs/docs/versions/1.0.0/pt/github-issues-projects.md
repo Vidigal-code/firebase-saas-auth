@@ -1,26 +1,37 @@
-# Variáveis de Ambiente
+# Variáveis de ambiente e deploy
 
-## Arquivo de Configuração
+## Variáveis do frontend (`web/.env`)
 
-Copie `envexample.txt` para `.env` no diretório `web/`.
+| Variável | Descrição |
+|---|---|
+| `VITE_FIREBASE_API_KEY` | API key do app web |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Domínio de autenticação |
+| `VITE_FIREBASE_PROJECT_ID` | ID do projeto |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Bucket do Storage |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Sender ID |
+| `VITE_FIREBASE_APP_ID` | App ID |
+| `VITE_USE_EMULATORS` | `true` conecta Auth e Firestore aos emuladores locais |
+| `VITE_DEFAULT_LANG` | Idioma inicial: `pt`, `en` ou `es` |
 
-## Variáveis Obrigatórias
+As variáveis são validadas com Zod na inicialização: se faltar alguma, o app informa qual.
 
-| Variável | Descrição | Exemplo |
-|---|---|---|
-| `VITE_FIREBASE_API_KEY` | Chave da API Firebase | `AIzaSy...` |
-| `VITE_FIREBASE_AUTH_DOMAIN` | Domínio de autenticação | `projeto.firebaseapp.com` |
-| `VITE_FIREBASE_PROJECT_ID` | ID do projeto | `meu-projeto-id` |
-| `VITE_FIREBASE_STORAGE_BUCKET` | Bucket de armazenamento | `projeto.appspot.com` |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | ID do sender | `123456789` |
-| `VITE_FIREBASE_APP_ID` | ID do app | `1:123:web:abc` |
-| `VITE_START_LANG` | Idioma padrão | `pt`, `en` ou `es` |
-| `VITE_START_THEME` | Tema padrão | `dark` ou `light` |
+## Deploy manual
 
-## Como Funciona
+```bash
+firebase login
+npm run deploy
+```
 
-1. As credenciais Firebase conectam o app ao seu projeto Firebase
-2. `VITE_START_LANG` define o idioma inicial (salvo em `localStorage` após a primeira visita)
-3. `VITE_START_THEME` define o tema inicial (salvo em `localStorage` após a primeira visita)
-4. Parâmetros de URL (`?lang=en&theme=light`) sobrescrevem as preferências armazenadas
-5. Todas as variáveis com prefixo `VITE_` são expostas ao cliente no build via Vite
+## Deploy automático (GitHub Actions)
+
+O workflow `.github/workflows/firebase-deploy.yml` roda a cada push na `main`:
+
+1. **quality**: lint, typecheck, testes (regras, Functions, web unitário e integração com emuladores) e build.
+2. **deploy**: publica regras e índices do Firestore, Cloud Functions e Hosting.
+
+Configuração necessária no GitHub:
+
+- **Variables** (`Settings → Secrets and variables → Actions → Variables`): as seis variáveis `VITE_FIREBASE_*` acima.
+- **Secret** `FIREBASE_SERVICE_ACCOUNT`: JSON de uma conta de serviço do projeto com os papéis *Firebase Admin*, *Cloud Functions Admin*, *Service Account User* e *Cloud Scheduler Admin*.
+
+Pull requests executam apenas o job de qualidade.

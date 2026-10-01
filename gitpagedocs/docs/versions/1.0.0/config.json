@@ -118,9 +118,9 @@
         "es": "Funcionalidades"
       },
       "description": {
-        "pt": "Auth, CRUD, i18n, temas e componentes reutilizáveis",
-        "en": "Auth, CRUD, i18n, themes and reusable components",
-        "es": "Auth, CRUD, i18n, temas y componentes reutilizables"
+        "pt": "Auth, conexões, contatos, broadcast e agendamento",
+        "en": "Auth, connections, contacts, broadcast and scheduling",
+        "es": "Auth, conexiones, contactos, broadcast y programación"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -150,14 +150,14 @@
     {
       "id": 4,
       "title": {
-        "pt": "Variáveis de ambiente",
-        "en": "Environment Variables",
-        "es": "Variables de entorno"
+        "pt": "Variáveis de ambiente e deploy",
+        "en": "Environment Variables & Deploy",
+        "es": "Variables de entorno y deploy"
       },
       "description": {
-        "pt": "Configuração do .env e variáveis Firebase",
-        "en": "Configure .env file and Firebase variables",
-        "es": "Configuración del .env y variables Firebase"
+        "pt": "Configuração do .env e deploy automático com GitHub Actions",
+        "en": ".env configuration and automatic deploy with GitHub Actions",
+        "es": "Configuración del .env y deploy automático con GitHub Actions"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -192,9 +192,9 @@
         "es": "Arquitectura"
       },
       "description": {
-        "pt": "Feature-Sliced Design, camadas e gerenciamento de estado",
-        "en": "Feature-Sliced Design, layers and state management",
-        "es": "Feature-Sliced Design, capas y gestión de estado"
+        "pt": "Feature-Sliced Design, repositórios Firestore e Cloud Functions",
+        "en": "Feature-Sliced Design, Firestore repositories and Cloud Functions",
+        "es": "Feature-Sliced Design, repositorios Firestore y Cloud Functions"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -229,9 +229,9 @@
         "es": "Reglas Firestore y seguridad"
       },
       "description": {
-        "pt": "Multi-tenant, proteção de rotas e modelo de dados",
-        "en": "Multi-tenant, route protection and data model",
-        "es": "Multi-tenant, protección de rutas y modelo de datos"
+        "pt": "Modelo de dados, isolamento multi-tenant e testes das regras",
+        "en": "Data model, multi-tenant isolation and rules tests",
+        "es": "Modelo de datos, aislamiento multi-tenant y pruebas de reglas"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -312,15 +312,15 @@
     {
       "id": 4,
       "pt": {
-        "title": "Variáveis de ambiente",
+        "title": "Variáveis de ambiente e deploy",
         "path-click": "gitpagedocs/docs/versions/1.0.0/pt/github-issues-projects.md"
       },
       "en": {
-        "title": "Environment Variables",
+        "title": "Environment Variables & Deploy",
         "path-click": "gitpagedocs/docs/versions/1.0.0/en/github-issues-projects.md"
       },
       "es": {
-        "title": "Variables de entorno",
+        "title": "Variables de entorno y deploy",
         "path-click": "gitpagedocs/docs/versions/1.0.0/es/github-issues-projects.md"
       }
     },

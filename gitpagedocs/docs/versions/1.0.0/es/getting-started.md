@@ -1,59 +1,42 @@
-# Primeros Pasos
+# Primeros pasos
 
-## Requisitos Previos
+## Requisitos previos
 
-- **Node.js** v18+
-- **npm** v9+
-- **Firebase CLI** instalado globalmente
-- Un proyecto **Firebase** con Authentication y Firestore habilitados
+- **Node.js 22** y npm 10+
+- **Java 21+** (necesario para el emulador de Firestore)
+- **Firebase CLI** (`npm install --global firebase-tools`)
+- Un proyecto Firebase en el plan **Blaze** (obligatorio para Cloud Functions programadas) con Authentication (correo/contraseña) y Firestore habilitados
 
 ## Instalación
 
 ```bash
 git clone https://github.com/Vidigal-code/firebase-saas-auth.git
 cd firebase-saas-auth
+npm run install:all
+cp web/.env.example web/.env
 ```
 
-### Web (Frontend)
+Completa `web/.env` con la configuración de la app web de Firebase (`firebase apps:sdkconfig WEB`).
+
+## Ejecución local con los emuladores
 
 ```bash
-cd web
-npm install
-cp envexample.txt .env
+npm run emulators            # Auth, Firestore y Functions locales
+npm --prefix web run dev:emulators
 ```
 
-Edita el `.env` con tus credenciales Firebase:
+La aplicación queda en `http://localhost:5173` y la interfaz de los emuladores en `http://localhost:4000`.
 
-```env
-VITE_FIREBASE_API_KEY=tu-api-key
-VITE_FIREBASE_AUTH_DOMAIN=tu-proyecto.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=tu-project-id
-VITE_FIREBASE_STORAGE_BUCKET=tu-proyecto.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=tu-sender-id
-VITE_FIREBASE_APP_ID=tu-app-id
-VITE_START_LANG=pt
-VITE_START_THEME=dark
-```
+> El emulador de Functions no ejecuta funciones programadas sin el emulador de Pub/Sub; el disparo automático de los mensajes programados se valida con las pruebas de `functions/` y en producción.
 
-### Cloud Functions (Backend)
+## Scripts principales (raíz)
 
-```bash
-cd functions
-npm install
-```
+| Script | Qué hace |
+|---|---|
+| `npm run lint` | ESLint en `functions/` y `web/` |
+| `npm run typecheck` | TypeScript de las pruebas de reglas, functions y web |
+| `npm test` | Reglas de Firestore, Cloud Functions, pruebas unitarias y de integración del web |
+| `npm run build` | Build de las Functions y del web |
+| `npm run deploy` | Deploy de reglas, índices, Functions y Hosting |
 
-## Ejecutar Localmente
-
-```bash
-cd web
-npm run dev
-```
-
-La aplicación estará disponible en `http://localhost:5173`.
-
-## Deploy en Firebase
-
-```bash
-npm run build
-npx firebase-tools deploy --only firestore,hosting
-```
+Las pruebas que usan emuladores se ejecutan mediante `scripts/with-emulators.mjs`, que levanta los emuladores necesarios y los detiene al final.

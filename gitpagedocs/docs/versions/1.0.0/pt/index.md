@@ -2,27 +2,26 @@
 
 ## BroadcastApp
 
-Uma plataforma **SaaS de Disparos em Massa** completa construída com React, TypeScript, MUI e Firebase.
+Aplicação **SaaS multi-tenant de Broadcast** construída com React, TypeScript, Material UI, Tailwind CSS e Firebase (Authentication, Firestore e Cloud Functions).
 
-### Demo Online
+### Demo online
 
 [https://fir-saas-auth-4a138.web.app/](https://fir-saas-auth-4a138.web.app/)
 
-### Principais Funcionalidades
+### Principais funcionalidades
 
-- **Autenticação** — Login, cadastro e gerenciamento de senha com Firebase Auth
-- **Conexões** — Crie espaços de trabalho isolados para gerenciar contatos e mensagens
-- **Contatos** — Gerencie contatos com nome e telefone por conexão
-- **Mensagens** — Envie e agende mensagens em massa para contatos
-- **i18n** — Suporte completo para Português, Inglês e Espanhol
-- **Temas** — Modo Escuro e Claro com sincronização por parâmetro de URL
-- **Guardas de Rota** — `PrivateRoute` e `GuestRoute` para controle de acesso
-- **Responsivo** — Design mobile-first com padrão de navegação unificado
-- **FSD** — Arquitetura Feature-Sliced Design para separação limpa de responsabilidades
+- **Autenticação**: login, cadastro e troca de senha com Firebase Authentication; cada usuário cadastrado é um cliente (tenant).
+- **Conexões**: CRUD completo; cada cliente vê apenas as próprias conexões.
+- **Contatos**: CRUD de nome e telefone por conexão.
+- **Broadcast**: seleção de um ou vários contatos, envio imediato ou agendado, edição, exclusão e filtro entre enviadas e agendadas.
+- **Agendamento no backend**: a Cloud Function `dispatchScheduledMessages` muda o status de "Agendada" para "Enviada" no horário definido, sem depender do app aberto.
+- **Tempo real**: todas as listas usam listeners `onSnapshot` do Firestore.
+- **Isolamento entre clientes**: garantido pelas regras do Firestore e coberto por testes automatizados.
+- **i18n e temas**: Português, Inglês e Espanhol; modo claro e escuro.
 
-### Stack Tecnológica
+### Stack
 
-`React 19` · `TypeScript` · `Vite` · `MUI v6` · `Redux Toolkit` · `Firebase Auth` · `Cloud Firestore` · `Cloud Functions`
+`React 19` · `TypeScript 6` · `Vite 8` · `MUI 9` · `Tailwind CSS 4` · `React Router 7` · `React Hook Form + Zod` · `Firebase Auth` · `Cloud Firestore` · `Cloud Functions v2 (Node 22)` · `Vitest`
 
 ### Repositório
 

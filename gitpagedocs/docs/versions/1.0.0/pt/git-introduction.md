@@ -1,31 +1,39 @@
 # Arquitetura
 
-## Feature-Sliced Design (FSD)
-
-A aplicação segue a metodologia **Feature-Sliced Design**, garantindo isolamento estrito de camadas e máxima reutilização de código.
-
-### Hierarquia de Camadas
+## Frontend: Feature-Sliced Design
 
 ```
-app → pages → widgets → features → entities → shared
+web/src/
+├── app/        # Providers (tema, i18n, sessão, notificações), rotas e estilos globais
+├── pages/      # Telas: home, login, cadastro, conexões, contatos, broadcast, 404
+├── widgets/    # Layouts: app shell (topo, menu da conta) e layout da conexão (abas)
+├── features/   # Casos de uso: auth, editores de conexão/contato, compositor e filtro de mensagens
+├── entities/   # Modelos, repositórios Firestore e hooks: session, connection, contact, message
+└── shared/     # Firebase, i18n, tema, hooks e componentes genéricos
 ```
 
-Cada camada só pode importar de camadas abaixo dela. Isso garante fluxo de dependência unidirecional.
+- **Repositórios** (`entities/*/api`) concentram o acesso ao Firestore: consultas tipadas com conversores e funções de escrita com payloads explícitos.
+- **Tempo real**: `useRealtimeQuery` e `useRealtimeDocument` assinam consultas com `onSnapshot` e nunca exibem dados de uma consulta anterior.
+- **Estado**: a sessão vem de `onAuthStateChanged` (contexto React); os dados vêm direto dos listeners do Firestore, sem cache global extra.
+- **Estilo**: componentes do Material UI, estilização com classes Tailwind. As camadas CSS (`theme, base, mui, components, utilities`) fazem o Tailwind ter prioridade, e as cores do tema MUI viram utilitários Tailwind (`bg-background-paper`, `text-primary`...).
 
-### Camadas Explicadas
+## Backend: Cloud Functions
 
-| Camada | Responsabilidade | Exemplos |
+```
+functions/src/
+├── index.ts                    # Registro das funções
+├── messages/dispatchDueMessages.ts
+├── cascade/deleteConnectionData.ts
+├── cascade/detachContactFromMessages.ts
+├── lib/                        # Paginação e escrita em lote (BulkWriter)
+├── domain/                     # Coleções, campos e status
+└── config/runtime.ts           # Região, agenda e tamanho de página
+```
+
+| Função | Gatilho | Responsabilidade |
 |---|---|---|
-| `app` | Setup global, providers, router, store | `ThemeProvider`, `LangProvider`, `router` |
-| `pages` | Composições de página completa | `ConnectionsPage`, `LoginPage`, `NotFoundPage` |
-| `widgets` | Blocos de UI complexos, layouts | `PublicLayout`, `DashboardLayout`, `AppSidebar` |
-| `features` | Lógica de negócio + UI para ações do usuário | `useConnectionCrud`, `ConnectionDialog` |
-| `entities` | Modelos de domínio + componentes de exibição | `ConnectionCard`, `ContactCard` |
-| `shared` | Utilitários reutilizáveis, UI, hooks, config | `useLang`, `LangSelector`, `ConfirmDialog` |
+| `dispatchScheduledMessages` | Agenda (a cada 1 min) | Muda `scheduled` → `sent` quando `scheduledAt <= agora` |
+| `cleanupDeletedConnection` | `connections/{id}` excluído | Remove contatos e mensagens da conexão |
+| `detachDeletedContact` | `contacts/{id}` excluído | Remove o contato de `contactIds` das mensagens |
 
-### Gerenciamento de Estado
-
-- **Redux Toolkit** para estado global de autenticação (slice `user`)
-- **React Context** para modo de tema (`ThemeModeContext`)
-- **React Context** para idioma (`LangContext`)
-- **Estado local** (`useState`) para lógica específica de UI (dialogs, menus)
+O disparo usa uma pré-condição (`lastUpdateTime`): se o cliente editar a mensagem no mesmo instante, a escrita é descartada e a mensagem é reavaliada no minuto seguinte.

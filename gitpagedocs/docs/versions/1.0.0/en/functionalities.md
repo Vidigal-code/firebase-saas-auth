@@ -2,60 +2,35 @@
 
 ## Authentication
 
-- **Login** with email and password via Firebase Auth
-- **Registration** with strong password validation (min 8 chars, uppercase, lowercase, number, special)
-- **Password change** dialog inside the dashboard
-- **Route guards**: `PrivateRoute` blocks unauthenticated access, `GuestRoute` redirects logged-in users away from public pages
+- Sign-up and login with email and password (Firebase Authentication).
+- Password policy: at least 8 characters with uppercase, lowercase, number, and symbol.
+- Password change with reauthentication.
+- Each registered user is a **client**; their `uid` is the `clientId` of all their data.
+- Routes protected by `RequireAuth` and `RequireGuest`.
 
-## Connections Management
+## Connections
 
-- **Create** named connections (isolated workspaces)
-- **Edit** connection name
-- **Delete** with confirmation dialog
-- Each connection is a multi-tenant data silo — users only see their own data
+- Create, list (real time), rename, and delete.
+- When a connection is deleted, the `cleanupDeletedConnection` Cloud Function removes its contacts and messages.
 
-## Contacts Management
+## Contacts
 
-- **Add contacts** with name and phone per connection
-- **Edit** and **delete** contacts
-- Paginated listing with real-time Firestore listeners
+- Name and phone per connection; the phone is normalized (e.g. `+55 (11) 99999-8888` → `+5511999998888`) and validated.
+- When a contact is deleted, the `detachDeletedContact` Cloud Function removes it from message recipients.
 
-## Messages & Broadcast
+## Broadcast
 
-- **Send messages** to multiple contacts simultaneously
-- **Schedule messages** for future delivery
-- **Tabs**: All, Sent, Scheduled
-- Real-time status tracking per message
+- Select one or more contacts (search and "select all").
+- **Send now**: the message is saved as `sent` with the server time (simulated delivery).
+- **Schedule**: the message stays `scheduled` until the chosen time, which must be in the future.
+- **Automatic dispatch**: the `dispatchScheduledMessages` Cloud Function runs every minute and switches to `sent` every message whose time has come, even with the app closed. The update shows up on screen in real time.
+- **All / Sent / Scheduled** filters with counters.
+- Editing: scheduled messages can change text, contacts, and time (or be sent now); sent messages can only change text and contacts.
+- Deletion with confirmation.
 
-## Internationalization (i18n)
+## Experience
 
-- **3 languages**: Portuguese (PT), English (EN), Spanish (ES)
-- JSON-based translation system in `src/shared/langs/`
-- `LangProvider` with URL parameter sync (`?lang=pt`)
-- `localStorage` persistence with fallback to `VITE_START_LANG`
-- `LangSelector` component for runtime switching
-
-## Theming
-
-- **Dark** and **Light** mode support
-- `ThemeToggleButton` component
-- Persistence via `localStorage` with fallback to `VITE_START_THEME`
-- URL parameter sync (`?theme=dark`)
-
-## Security
-
-- **Firestore Rules** enforce multi-tenant isolation via `clientId` validation
-- Each user can only read/write their own connections, contacts, and messages
-- Strong password policy enforced at registration
-
-## Reusable Components
-
-| Component | Purpose |
-|---|---|
-| `LangSelector` | Language dropdown selector |
-| `ThemeToggleButton` | Dark/Light mode toggle |
-| `LangThemeBar` | Combined lang + theme grid layout |
-| `ActionButtonGroup` | Configurable button grid |
-| `ConfirmDialog` | Reusable deletion confirmation |
-| `PageHeader` | Standardized page header with icon and subtitle |
-| `BrandLogo` | App logo with configurable sizes |
+- Interface in Portuguese, English, and Spanish (`?lang=en` also works).
+- Light and dark theme.
+- Responsive layout (full-screen dialogs on mobile).
+- Feedback through notifications and loading, error, and empty states.

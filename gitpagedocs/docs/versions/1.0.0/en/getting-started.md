@@ -1,59 +1,42 @@
-# Getting Started
+# Getting started
 
 ## Prerequisites
 
-- **Node.js** v18+
-- **npm** v9+
-- **Firebase CLI** installed globally
-- A **Firebase** project with Authentication and Firestore enabled
+- **Node.js 22** and npm 10+
+- **Java 21+** (required by the Firestore emulator)
+- **Firebase CLI** (`npm install --global firebase-tools`)
+- A Firebase project on the **Blaze** plan (required for scheduled Cloud Functions) with Authentication (email/password) and Firestore enabled
 
 ## Installation
 
 ```bash
 git clone https://github.com/Vidigal-code/firebase-saas-auth.git
 cd firebase-saas-auth
+npm run install:all
+cp web/.env.example web/.env
 ```
 
-### Web (Frontend)
+Fill in `web/.env` with the Firebase web app configuration (`firebase apps:sdkconfig WEB`).
+
+## Running locally with the emulators
 
 ```bash
-cd web
-npm install
-cp envexample.txt .env
+npm run emulators            # Local Auth, Firestore, and Functions
+npm --prefix web run dev:emulators
 ```
 
-Edit `.env` with your Firebase credentials:
+The app runs at `http://localhost:5173` and the emulator UI at `http://localhost:4000`.
 
-```env
-VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-VITE_FIREBASE_APP_ID=your-app-id
-VITE_START_LANG=pt
-VITE_START_THEME=dark
-```
+> The Functions emulator does not run scheduled functions without the Pub/Sub emulator; automatic dispatch of scheduled messages is validated by the `functions/` tests and in production.
 
-### Cloud Functions (Backend)
+## Main scripts (root)
 
-```bash
-cd functions
-npm install
-```
+| Script | What it does |
+|---|---|
+| `npm run lint` | ESLint on `functions/` and `web/` |
+| `npm run typecheck` | TypeScript for rules tests, functions, and web |
+| `npm test` | Firestore rules, Cloud Functions, and web unit and integration tests |
+| `npm run build` | Builds Functions and web |
+| `npm run deploy` | Deploys rules, indexes, Functions, and Hosting |
 
-## Running Locally
-
-```bash
-cd web
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`.
-
-## Deploy to Firebase
-
-```bash
-npm run build
-npx firebase-tools deploy --only firestore,hosting
-```
+Tests that need emulators run through `scripts/with-emulators.mjs`, which starts the required emulators and shuts them down at the end.

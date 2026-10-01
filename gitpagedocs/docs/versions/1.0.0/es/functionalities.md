@@ -2,60 +2,35 @@
 
 ## Autenticación
 
-- **Login** con email y contraseña vía Firebase Auth
-- **Registro** con validación de contraseña fuerte (mín. 8 caracteres, mayúscula, minúscula, número, especial)
-- **Cambio de contraseña** vía diálogo en el dashboard
-- **Guardias de ruta**: `PrivateRoute` bloquea acceso no autenticado, `GuestRoute` redirige usuarios conectados fuera de las páginas públicas
+- Registro e inicio de sesión con correo y contraseña (Firebase Authentication).
+- Política de contraseña: mínimo de 8 caracteres con mayúscula, minúscula, número y símbolo.
+- Cambio de contraseña con reautenticación.
+- Cada usuario registrado es un **cliente**; su `uid` es el `clientId` de todos sus datos.
+- Rutas protegidas por `RequireAuth` y `RequireGuest`.
 
-## Gestión de Conexiones
+## Conexiones
 
-- **Crear** conexiones nombradas (espacios de trabajo aislados)
-- **Editar** nombre de la conexión
-- **Eliminar** con diálogo de confirmación
-- Cada conexión es un silo multi-tenant — los usuarios solo ven sus propios datos
+- Crear, listar (tiempo real), renombrar y eliminar.
+- Al eliminar una conexión, la Cloud Function `cleanupDeletedConnection` borra sus contactos y mensajes.
 
-## Gestión de Contactos
+## Contactos
 
-- **Agregar contactos** con nombre y teléfono por conexión
-- **Editar** y **eliminar** contactos
-- Listado paginado con listeners en tiempo real de Firestore
+- Nombre y teléfono por conexión; el teléfono se normaliza (ej.: `+55 (11) 99999-8888` → `+5511999998888`) y se valida.
+- Al eliminar un contacto, la Cloud Function `detachDeletedContact` lo quita de los destinatarios de los mensajes.
 
-## Mensajes y Envíos Masivos
+## Broadcast
 
-- **Enviar mensajes** a múltiples contactos simultáneamente
-- **Programar mensajes** para envío futuro
-- **Pestañas**: Todos, Enviados, Programados
-- Seguimiento de estado en tiempo real por mensaje
+- Selección de uno o varios contactos (búsqueda y "seleccionar todos").
+- **Enviar ahora**: el mensaje se guarda como `sent` con la hora del servidor (simulación del envío).
+- **Programar**: el mensaje queda `scheduled` hasta la hora elegida, que debe estar en el futuro.
+- **Disparo automático**: la Cloud Function `dispatchScheduledMessages` se ejecuta cada minuto y cambia a `sent` todo mensaje cuya hora llegó, incluso con la app cerrada. La actualización aparece en pantalla en tiempo real.
+- Filtros **Todos / Enviados / Programados** con contadores.
+- Edición: los mensajes programados pueden cambiar texto, contactos y hora (o enviarse ahora); los mensajes enviados solo cambian texto y contactos.
+- Eliminación con confirmación.
 
-## Internacionalización (i18n)
+## Experiencia
 
-- **3 idiomas**: Portugués (PT), Inglés (EN), Español (ES)
-- Sistema de traducción basado en JSON en `src/shared/langs/`
-- `LangProvider` con sincronización por parámetro de URL (`?lang=pt`)
-- Persistencia en `localStorage` con fallback a `VITE_START_LANG`
-- Componente `LangSelector` para cambio en tiempo de ejecución
-
-## Temas
-
-- Soporte para modo **Oscuro** y **Claro**
-- Componente `ThemeToggleButton`
-- Persistencia vía `localStorage` con fallback a `VITE_START_THEME`
-- Sincronización por parámetro de URL (`?theme=dark`)
-
-## Seguridad
-
-- **Firestore Rules** imponen aislamiento multi-tenant vía validación de `clientId`
-- Cada usuario solo puede leer/escribir sus propias conexiones, contactos y mensajes
-- Política de contraseña fuerte aplicada en el registro
-
-## Componentes Reutilizables
-
-| Componente | Propósito |
-|---|---|
-| `LangSelector` | Dropdown de selección de idioma |
-| `ThemeToggleButton` | Toggle modo oscuro/claro |
-| `LangThemeBar` | Layout grid combinado lang + tema |
-| `ActionButtonGroup` | Grid de botones configurable |
-| `ConfirmDialog` | Confirmación de eliminación reutilizable |
-| `PageHeader` | Encabezado estandarizado con ícono y subtítulo |
-| `BrandLogo` | Logo del app con tamaños configurables |
+- Interfaz en portugués, inglés y español (`?lang=en` también funciona).
+- Tema claro y oscuro.
+- Diseño responsivo (diálogos a pantalla completa en el móvil).
+- Feedback con notificaciones y estados de carga, error y vacío.

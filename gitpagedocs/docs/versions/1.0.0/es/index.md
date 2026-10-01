@@ -2,27 +2,26 @@
 
 ## BroadcastApp
 
-Una plataforma **SaaS de Envíos Masivos** completa construida con React, TypeScript, MUI y Firebase.
+Aplicación **SaaS multi-tenant de Broadcast** construida con React, TypeScript, Material UI, Tailwind CSS y Firebase (Authentication, Firestore y Cloud Functions).
 
-### Demo en Línea
+### Demo en línea
 
 [https://fir-saas-auth-4a138.web.app/](https://fir-saas-auth-4a138.web.app/)
 
-### Funcionalidades Principales
+### Funcionalidades principales
 
-- **Autenticación** — Login, registro y gestión de contraseña con Firebase Auth
-- **Conexiones** — Crea espacios de trabajo aislados para gestionar contactos y mensajes
-- **Contactos** — Gestiona contactos con nombre y teléfono por conexión
-- **Mensajes** — Envía y programa mensajes masivos a contactos
-- **i18n** — Soporte completo para Portugués, Inglés y Español
-- **Temas** — Modo Oscuro y Claro con sincronización por parámetro de URL
-- **Guardias de Ruta** — `PrivateRoute` y `GuestRoute` para control de acceso
-- **Responsivo** — Diseño mobile-first con patrón de navegación unificado
-- **FSD** — Arquitectura Feature-Sliced Design para separación limpia de responsabilidades
+- **Autenticación**: inicio de sesión, registro y cambio de contraseña con Firebase Authentication; cada usuario registrado es un cliente (tenant).
+- **Conexiones**: CRUD completo; cada cliente ve solo sus propias conexiones.
+- **Contactos**: CRUD de nombre y teléfono por conexión.
+- **Broadcast**: selección de uno o varios contactos, envío inmediato o programado, edición, eliminación y filtro entre enviados y programados.
+- **Programación en el backend**: la Cloud Function `dispatchScheduledMessages` cambia el estado de "Programado" a "Enviado" a la hora definida, sin depender de que la app esté abierta.
+- **Tiempo real**: todas las listas usan listeners `onSnapshot` de Firestore.
+- **Aislamiento entre clientes**: garantizado por las reglas de Firestore y cubierto por pruebas automatizadas.
+- **i18n y temas**: portugués, inglés y español; modo claro y oscuro.
 
-### Stack Tecnológico
+### Stack
 
-`React 19` · `TypeScript` · `Vite` · `MUI v6` · `Redux Toolkit` · `Firebase Auth` · `Cloud Firestore` · `Cloud Functions`
+`React 19` · `TypeScript 6` · `Vite 8` · `MUI 9` · `Tailwind CSS 4` · `React Router 7` · `React Hook Form + Zod` · `Firebase Auth` · `Cloud Firestore` · `Cloud Functions v2 (Node 22)` · `Vitest`
 
 ### Repositorio
 

@@ -2,60 +2,35 @@
 
 ## Autenticação
 
-- **Login** com email e senha via Firebase Auth
-- **Cadastro** com validação de senha forte (mín. 8 caracteres, maiúscula, minúscula, número, especial)
-- **Alteração de senha** via dialog no dashboard
-- **Guardas de rota**: `PrivateRoute` bloqueia acesso não autenticado, `GuestRoute` redireciona usuários logados para fora das páginas públicas
+- Cadastro e login com e-mail e senha (Firebase Authentication).
+- Política de senha: mínimo de 8 caracteres com maiúscula, minúscula, número e símbolo.
+- Troca de senha com reautenticação.
+- Cada usuário cadastrado é um **cliente**; o `uid` dele é o `clientId` de todos os seus dados.
+- Rotas protegidas por `RequireAuth` e `RequireGuest`.
 
-## Gestão de Conexões
+## Conexões
 
-- **Criar** conexões nomeadas (espaços de trabalho isolados)
-- **Editar** nome da conexão
-- **Excluir** com dialog de confirmação
-- Cada conexão é um silo multi-tenant — usuários veem apenas seus próprios dados
+- Criar, listar (tempo real), renomear e excluir.
+- Ao excluir uma conexão, a Cloud Function `cleanupDeletedConnection` remove os contatos e as mensagens dela.
 
-## Gestão de Contatos
+## Contatos
 
-- **Adicionar contatos** com nome e telefone por conexão
-- **Editar** e **excluir** contatos
-- Listagem paginada com listeners em tempo real do Firestore
+- Nome e telefone por conexão; o telefone é normalizado (ex.: `+55 (11) 99999-8888` → `+5511999998888`) e validado.
+- Ao excluir um contato, a Cloud Function `detachDeletedContact` o remove dos destinatários das mensagens.
 
-## Mensagens e Disparos
+## Broadcast
 
-- **Enviar mensagens** para múltiplos contatos simultaneamente
-- **Agendar mensagens** para envio futuro
-- **Abas**: Todas, Enviadas, Agendadas
-- Rastreamento de status em tempo real por mensagem
+- Seleção de um ou vários contatos (busca e "selecionar todos").
+- **Enviar agora**: a mensagem é gravada como `sent` com o horário do servidor (simulação do envio).
+- **Agendar**: a mensagem fica `scheduled` até o horário escolhido, que precisa estar no futuro.
+- **Disparo automático**: a Cloud Function `dispatchScheduledMessages` roda a cada minuto e muda para `sent` toda mensagem cujo horário chegou, mesmo com o app fechado. A atualização aparece na tela em tempo real.
+- Filtros **Todas / Enviadas / Agendadas** com contadores.
+- Edição: mensagens agendadas podem mudar texto, contatos e horário (ou ser enviadas agora); mensagens enviadas só mudam texto e contatos.
+- Exclusão com confirmação.
 
-## Internacionalização (i18n)
+## Experiência
 
-- **3 idiomas**: Português (PT), Inglês (EN), Espanhol (ES)
-- Sistema de tradução baseado em JSON em `src/shared/langs/`
-- `LangProvider` com sincronização por parâmetro de URL (`?lang=pt`)
-- Persistência em `localStorage` com fallback para `VITE_START_LANG`
-- Componente `LangSelector` para troca em tempo de execução
-
-## Temas
-
-- Suporte a modo **Escuro** e **Claro**
-- Componente `ThemeToggleButton`
-- Persistência via `localStorage` com fallback para `VITE_START_THEME`
-- Sincronização por parâmetro de URL (`?theme=dark`)
-
-## Segurança
-
-- **Firestore Rules** impõem isolamento multi-tenant via validação de `clientId`
-- Cada usuário só pode ler/escrever suas próprias conexões, contatos e mensagens
-- Política de senha forte aplicada no cadastro
-
-## Componentes Reutilizáveis
-
-| Componente | Finalidade |
-|---|---|
-| `LangSelector` | Dropdown de seleção de idioma |
-| `ThemeToggleButton` | Toggle modo escuro/claro |
-| `LangThemeBar` | Layout grid combinado lang + tema |
-| `ActionButtonGroup` | Grid de botões configurável |
-| `ConfirmDialog` | Confirmação de exclusão reutilizável |
-| `PageHeader` | Cabeçalho padronizado com ícone e subtítulo |
-| `BrandLogo` | Logo do app com tamanhos configuráveis |
+- Interface em Português, Inglês e Espanhol (`?lang=en` também funciona).
+- Tema claro e escuro.
+- Layout responsivo (dialogs em tela cheia no celular).
+- Feedback com notificações e estados de carregamento, erro e vazio.

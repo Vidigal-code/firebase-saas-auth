@@ -1,39 +1,35 @@
-# Visão Geral do Projeto
+# Visão geral do projeto
 
-## BroadcastApp — Firebase SaaS Auth
+## Estrutura do repositório
 
-Uma plataforma SaaS completa para gestão de comunicação em massa construída com **React**, **TypeScript**, **MUI** e **Firebase**.
+```
+firebase-saas-auth/
+├── functions/              # Cloud Functions (agendamento e limpeza em cascata)
+├── web/                    # Frontend React + Vite
+├── tests/                  # Testes das regras do Firestore (emulador)
+├── scripts/                # Utilitários (execução de testes com emuladores)
+├── firestore.rules         # Isolamento multi-tenant e validação de dados
+├── firestore.indexes.json  # Índices compostos das consultas
+├── firebase.json           # Hosting, Functions, Firestore e emuladores
+└── .github/workflows/      # CI/CD (testes + deploy automático)
+```
 
-## Stack Tecnológica
+## Stack
 
 | Camada | Tecnologia |
 |---|---|
-| **Frontend** | React 19 + TypeScript + Vite |
-| **UI** | Material UI (MUI) v6 |
-| **Estado** | Redux Toolkit |
-| **Autenticação** | Firebase Authentication |
-| **Banco de Dados** | Cloud Firestore (Realtime) |
-| **Backend** | Firebase Cloud Functions |
-| **Hospedagem** | Firebase Hosting |
-| **Arquitetura** | Feature-Sliced Design (FSD) |
-| **i18n** | JSON customizado (PT/EN/ES) |
+| UI | React 19, Material UI 9 (componentes), Tailwind CSS 4 (estilização) |
+| Build | Vite 8 |
+| Roteamento | React Router 7 |
+| Formulários | React Hook Form + Zod |
+| Backend | Firebase Authentication, Cloud Firestore, Cloud Functions v2 (Node 22) |
+| Testes | Vitest, Testing Library, `@firebase/rules-unit-testing`, emuladores Firebase |
+| Qualidade | ESLint (typescript-eslint strict), SonarQube |
 
-## Estrutura do Projeto (FSD)
+## Princípios
 
-```
-web/src/
-├── app/          → Providers, Router, Store
-├── pages/        → LoginPage, RegisterPage, ConnectionsPage, ...
-├── widgets/      → PublicLayout, DashboardLayout, AppHeader, AppSidebar
-├── features/     → Auth, Connection, Contact, Message CRUD
-├── entities/     → ConnectionCard, ContactCard, MessageCard
-└── shared/       → Hooks, Componentes UI, Config, Constantes, Langs
-```
-
-## Princípios Chave
-
-- **SOLID** — Responsabilidade única, aberto para extensão
-- **Clean Code** — Sem comentários, funções pequenas, sem hardcodes
-- **FSD** — Isolamento estrito de camadas (shared → entities → features → widgets → pages → app)
-- **Multi-tenant** — Isolamento de dados por usuário via Firestore Rules
-- **100% Responsivo** — Mobile-first com padrão unificado de drawer
+- **Paradigma funcional**: nenhuma classe; componentes, hooks e funções puras.
+- **Fonte única de verdade**: nomes de coleções, limites de validação, rotas e tokens de tema ficam em constantes; cores são definidas uma vez no tema do MUI e expostas ao Tailwind por variáveis CSS.
+- **Segurança no servidor**: o isolamento entre clientes é garantido pelas regras do Firestore, não apenas pela interface.
+- **Tempo real**: listas sincronizadas com `onSnapshot`.
+- **TDD**: regras, Functions e domínio do frontend cobertos por testes automatizados.

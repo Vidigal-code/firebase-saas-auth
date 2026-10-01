@@ -1,39 +1,35 @@
-# Project Overview
+# Project overview
 
-## BroadcastApp — Firebase SaaS Auth
+## Repository structure
 
-A complete SaaS platform for mass communication management built with **React**, **TypeScript**, **MUI**, and **Firebase**.
+```
+firebase-saas-auth/
+├── functions/              # Cloud Functions (scheduling and cascade cleanup)
+├── web/                    # React + Vite frontend
+├── tests/                  # Firestore rules tests (emulator)
+├── scripts/                # Utilities (running tests with emulators)
+├── firestore.rules         # Multi-tenant isolation and data validation
+├── firestore.indexes.json  # Composite indexes for queries
+├── firebase.json           # Hosting, Functions, Firestore, and emulators
+└── .github/workflows/      # CI/CD (tests + automatic deploy)
+```
 
-## Tech Stack
+## Stack
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React 19 + TypeScript + Vite |
-| **UI** | Material UI (MUI) v6 |
-| **State** | Redux Toolkit |
-| **Auth** | Firebase Authentication |
-| **Database** | Cloud Firestore (Realtime) |
-| **Backend** | Firebase Cloud Functions |
-| **Hosting** | Firebase Hosting |
-| **Architecture** | Feature-Sliced Design (FSD) |
-| **i18n** | Custom JSON-based (PT/EN/ES) |
+| UI | React 19, Material UI 9 (components), Tailwind CSS 4 (styling) |
+| Build | Vite 8 |
+| Routing | React Router 7 |
+| Forms | React Hook Form + Zod |
+| Backend | Firebase Authentication, Cloud Firestore, Cloud Functions v2 (Node 22) |
+| Testing | Vitest, Testing Library, `@firebase/rules-unit-testing`, Firebase emulators |
+| Quality | ESLint (typescript-eslint strict), SonarQube |
 
-## Project Structure (FSD)
+## Principles
 
-```
-web/src/
-├── app/          → Providers, Router, Store
-├── pages/        → LoginPage, RegisterPage, ConnectionsPage, ...
-├── widgets/      → PublicLayout, DashboardLayout, AppHeader, AppSidebar
-├── features/     → Auth, Connection, Contact, Message CRUD
-├── entities/     → ConnectionCard, ContactCard, MessageCard
-└── shared/       → Hooks, UI components, Config, Constants, Langs
-```
-
-## Key Principles
-
-- **SOLID** — Single responsibility, open for extension
-- **Clean Code** — No comments, small functions, no hardcodes
-- **FSD** — Strict layer isolation (shared → entities → features → widgets → pages → app)
-- **Multi-tenant** — Data isolation per user via Firestore Rules
-- **100% Responsive** — Mobile-first with unified drawer pattern
+- **Functional paradigm**: no classes; components, hooks, and pure functions.
+- **Single source of truth**: collection names, validation limits, routes, and theme tokens live in constants; colors are defined once in the MUI theme and exposed to Tailwind through CSS variables.
+- **Server-side security**: client isolation is enforced by Firestore rules, not just by the UI.
+- **Real time**: lists kept in sync with `onSnapshot`.
+- **TDD**: rules, Functions, and frontend domain covered by automated tests.
