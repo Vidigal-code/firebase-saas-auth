@@ -75,9 +75,25 @@ jobs:
     runs-on: ubuntu-24.04
     environment: production
     steps:
+      # Deploy is opt-in: without the service account secret the job is skipped with a
+      # warning, so forks and unconfigured repositories still get a green quality run.
+      - name: Check deploy credentials
+        id: credentials
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -n "$SERVICE_ACCOUNT" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Deploy skipped: add the FIREBASE_SERVICE_ACCOUNT secret (Settings > Secrets and variables > Actions) to enable it. See README, Deploy automático."
+          fi
+
       - uses: actions/checkout@v7
+        if: steps.credentials.outputs.configured == 'true'
 
       - uses: actions/setup-node@v7
+        if: steps.credentials.outputs.configured == 'true'
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -87,26 +103,20 @@ jobs:
             web/package-lock.json
 
       - name: Install dependencies
+        if: steps.credentials.outputs.configured == 'true'
         run: |
           npm ci
           npm ci --prefix functions
           npm ci --prefix web
 
-      - name: Check deploy credentials
-        env:
-          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          if [ -z "$SERVICE_ACCOUNT" ]; then
-            echo "::error::Missing FIREBASE_SERVICE_ACCOUNT secret. Add a service account key JSON in Settings > Secrets and variables > Actions (see README, Deploy automático)."
-            exit 1
-          fi
-
       - name: Authenticate to Google Cloud
+        if: steps.credentials.outputs.configured == 'true'
         uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
       - name: Deploy Firestore rules and indexes, Cloud Functions and Hosting
+        if: steps.credentials.outputs.configured == 'true'
         run: >
           npx firebase deploy
           --only firestore,functions,hosting
