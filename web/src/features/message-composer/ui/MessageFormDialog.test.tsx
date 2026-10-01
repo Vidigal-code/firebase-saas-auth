@@ -13,39 +13,48 @@ vi.mock('@/entities/message/api/messagesRepository', () => ({
 }));
 
 const SCOPE = { clientId: 'client-a', connectionId: 'conn-1' };
+const FIRST_CONTACT_ID = 'c1';
+const SECOND_CONTACT_ID = 'c2';
 const CONTACTS = [
-  { id: 'c1', connectionId: 'conn-1', name: 'Ana', phone: '1133334444' },
-  { id: 'c2', connectionId: 'conn-1', name: 'Bruno', phone: '1133335555' },
+  { id: FIRST_CONTACT_ID, connectionId: SCOPE.connectionId, name: 'Ana', phone: '1133334444' },
+  { id: SECOND_CONTACT_ID, connectionId: SCOPE.connectionId, name: 'Bruno', phone: '1133335555' },
 ];
 const HOUR_IN_MS = 3_600_000;
+const SENT_AT = new Date(2026, 9, 1);
+const SCHEDULE_LABEL = 'Agendar';
+const SEND_NOW_LABEL = 'Enviar agora';
+const INACTIVE_DISPATCH_TEXT = /Disparo automático inativo/;
 
 const SENT_MESSAGE: Message = {
   id: 'm1',
-  connectionId: 'conn-1',
-  contactIds: ['c1'],
+  connectionId: SCOPE.connectionId,
+  contactIds: [FIRST_CONTACT_ID],
   content: 'Promo',
   status: 'sent',
   scheduledAt: null,
-  sentAt: new Date(2026, 9, 1),
-  createdAt: new Date(2026, 9, 1),
+  sentAt: SENT_AT,
+  createdAt: SENT_AT,
 };
 
 const renderDialog = (message: Message | null = null) =>
   renderWithProviders(<MessageFormDialog scope={SCOPE} contacts={CONTACTS} message={message} onClose={vi.fn()} />);
 
 const messageField = () => screen.getByRole('textbox', { name: 'Mensagem' });
+const selectAllContacts = () => userEvent.click(screen.getByRole('button', { name: 'Selecionar todos' }));
+const sendNow = () => userEvent.click(screen.getByRole('button', { name: SEND_NOW_LABEL }));
+const enableScheduling = () => userEvent.click(screen.getByLabelText(SCHEDULE_LABEL));
 
 describe('MessageFormDialog', () => {
   it('sends a message to every selected contact right away', async () => {
     renderDialog();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Selecionar todos' }));
+    await selectAllContacts();
     await userEvent.type(messageField(), 'Promo de hoje');
-    await userEvent.click(screen.getByRole('button', { name: 'Enviar agora' }));
+    await sendNow();
 
     await waitFor(() =>
       expect(createMessage).toHaveBeenCalledWith(SCOPE, {
-        contactIds: ['c1', 'c2'],
+        contactIds: [FIRST_CONTACT_ID, SECOND_CONTACT_ID],
         content: 'Promo de hoje',
         delivery: 'now',
         scheduledAt: null,
@@ -58,7 +67,7 @@ describe('MessageFormDialog', () => {
     renderDialog();
 
     await userEvent.type(messageField(), 'Oi');
-    await userEvent.click(screen.getByRole('button', { name: 'Enviar agora' }));
+    await sendNow();
 
     expect(await screen.findByText('Selecione ao menos um contato.')).toBeInTheDocument();
     expect(createMessage).not.toHaveBeenCalled();
@@ -69,13 +78,13 @@ describe('MessageFormDialog', () => {
     future.setSeconds(0, 0);
     renderDialog();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Selecionar todos' }));
+    await selectAllContacts();
     await userEvent.type(messageField(), 'Lembrete');
-    await userEvent.click(screen.getByLabelText('Agendar'));
+    await enableScheduling();
     const scheduleInput = screen.getByLabelText('Data e horário');
     await userEvent.clear(scheduleInput);
     await userEvent.type(scheduleInput, toDateTimeLocalValue(future));
-    await userEvent.click(screen.getByRole('button', { name: 'Agendar' }));
+    await userEvent.click(screen.getByRole('button', { name: SCHEDULE_LABEL }));
 
     await waitFor(() =>
       expect(createMessage).toHaveBeenCalledWith(
@@ -90,7 +99,7 @@ describe('MessageFormDialog', () => {
     renderDialog(SENT_MESSAGE);
 
     expect(screen.getByText(/já foi enviada/)).toBeInTheDocument();
-    expect(screen.queryByLabelText('Agendar')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(SCHEDULE_LABEL)).not.toBeInTheDocument();
 
     await userEvent.type(messageField(), ' corrigida');
     await userEvent.click(screen.getByRole('button', { name: 'Salvar alterações' }));
@@ -98,5 +107,14 @@ describe('MessageFormDialog', () => {
     await waitFor(() =>
       expect(updateMessage).toHaveBeenCalledWith(SENT_MESSAGE, expect.objectContaining({ content: 'Promo corrigida' })),
     );
+  });
+
+  it('warns about the inactive automatic dispatch only when scheduling', async () => {
+    renderDialog();
+    expect(screen.queryByText(INACTIVE_DISPATCH_TEXT)).not.toBeInTheDocument();
+
+    await enableScheduling();
+
+    expect(screen.getByText(INACTIVE_DISPATCH_TEXT)).toBeInTheDocument();
   });
 });

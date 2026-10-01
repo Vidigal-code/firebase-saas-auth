@@ -23,7 +23,11 @@
     "deleteError": "Could not delete. Please try again.",
     "previousPage": "Previous page",
     "pagination": "Pagination",
-    "creator": "Built by"
+    "creator": "Built by",
+    "openNavigation": "Open navigation menu",
+    "closeNavigation": "Close navigation menu",
+    "navigationMenu": "Menu",
+    "theme": "Theme"
   },
   "validation": {
     "required": "This field is required.",
@@ -180,7 +184,8 @@
     "removedContact": "Removed contact",
     "noContacts": "Add contacts to this connection before sending messages.",
     "goToContacts": "Go to contacts",
-    "sentEditHint": "This message was already sent: only its text and contacts can be edited."
+    "sentEditHint": "This message was already sent: only its text and contacts can be edited.",
+    "dispatchInactive": "Automatic dispatch is inactive in this environment: the Cloud Function that turns messages from \"Scheduled\" into \"Sent\" is implemented and tested but not deployed (it requires the Firebase Blaze plan). Scheduled messages stay \"Scheduled\"; use \"Edit → Send now\" to send them."
   },
   "notFound": {
     "code": "404",

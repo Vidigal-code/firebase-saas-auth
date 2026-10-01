@@ -22,29 +22,36 @@ vi.mock('@/widgets/connection-shell/connectionContext', () => ({
   useConnectionContext: () => ({ connection: CONNECTION, scope: SCOPE }),
 }));
 
-const CONTACTS = [{ id: 'c1', connectionId: SCOPE.connectionId, name: 'Ana Souza', phone: '1133334444' }];
+const CONTACT_ID = 'c1';
+const CONTACTS = [{ id: CONTACT_ID, connectionId: SCOPE.connectionId, name: 'Ana Souza', phone: '1133334444' }];
+const SENT_MESSAGE_ID = 'm1';
+const SENT_CONTENT = 'Promo enviada';
+const SCHEDULED_CONTENT = 'Lembrete agendado';
+const CREATED_AT = new Date(2026, 9, 1);
+const SENT_AT = new Date(2026, 9, 1, 9, 0);
+const SCHEDULED_AT = new Date(2026, 9, 2, 8, 30);
 
 const buildMessage = (overrides: Partial<Message>): Message => ({
   id: 'm',
   connectionId: SCOPE.connectionId,
-  contactIds: ['c1'],
+  contactIds: [CONTACT_ID],
   content: '',
   status: 'sent',
   scheduledAt: null,
-  sentAt: new Date(2026, 9, 1, 9, 0),
-  createdAt: new Date(2026, 9, 1),
+  sentAt: SENT_AT,
+  createdAt: CREATED_AT,
   ...overrides,
 });
 
 const MESSAGES = [
-  buildMessage({ id: 'm1', content: 'Promo enviada' }),
+  buildMessage({ id: SENT_MESSAGE_ID, content: SENT_CONTENT }),
   buildMessage({
     id: 'm2',
-    content: 'Lembrete agendado',
+    content: SCHEDULED_CONTENT,
     status: 'scheduled',
-    scheduledAt: new Date(2026, 9, 2, 8, 30),
+    scheduledAt: SCHEDULED_AT,
     sentAt: null,
-    contactIds: ['c1', 'gone'],
+    contactIds: [CONTACT_ID, 'gone'],
   }),
 ];
 
@@ -59,7 +66,7 @@ describe('BroadcastPage', () => {
   it('shows message status, delivery time and recipients', () => {
     renderWithProviders(<BroadcastPage />);
 
-    const scheduledCard = screen.getByText('Lembrete agendado').closest('article') as HTMLElement;
+    const scheduledCard = screen.getByText(SCHEDULED_CONTENT).closest('article') as HTMLElement;
     expect(within(scheduledCard).getByText('Agendada')).toBeInTheDocument();
     expect(within(scheduledCard).getByText(/Agendada para/)).toBeInTheDocument();
     expect(within(scheduledCard).getByText('Ana Souza')).toBeInTheDocument();
@@ -70,12 +77,12 @@ describe('BroadcastPage', () => {
     renderWithProviders(<BroadcastPage />);
 
     await userEvent.click(screen.getByRole('tab', { name: 'Agendadas (1)' }));
-    expect(screen.queryByText('Promo enviada')).not.toBeInTheDocument();
-    expect(screen.getByText('Lembrete agendado')).toBeInTheDocument();
+    expect(screen.queryByText(SENT_CONTENT)).not.toBeInTheDocument();
+    expect(screen.getByText(SCHEDULED_CONTENT)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('tab', { name: 'Enviadas (1)' }));
-    expect(screen.getByText('Promo enviada')).toBeInTheDocument();
-    expect(screen.queryByText('Lembrete agendado')).not.toBeInTheDocument();
+    expect(screen.getByText(SENT_CONTENT)).toBeInTheDocument();
+    expect(screen.queryByText(SCHEDULED_CONTENT)).not.toBeInTheDocument();
   });
 
   it('opens the editor for a message and deletes another', async () => {
@@ -87,7 +94,7 @@ describe('BroadcastPage', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /^Excluir: Promo/ }));
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Excluir' }));
-    await waitFor(() => expect(deleteMessage).toHaveBeenCalledWith('m1'));
+    await waitFor(() => expect(deleteMessage).toHaveBeenCalledWith(SENT_MESSAGE_ID));
   });
 
   it('asks for contacts before composing when the connection has none', () => {
@@ -100,5 +107,11 @@ describe('BroadcastPage', () => {
       'href',
       `/connections/${SCOPE.connectionId}/contacts`,
     );
+  });
+
+  it('explains that automatic dispatch is inactive while the Cloud Function is disabled', () => {
+    renderWithProviders(<BroadcastPage />);
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Disparo automático inativo');
   });
 });

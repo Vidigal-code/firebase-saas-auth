@@ -11,6 +11,7 @@ import {
   type MessageFormValues,
 } from '@/entities/message/model/messageForm';
 import type { Message } from '@/entities/message/model/types';
+import { ScheduledDispatchNotice } from '@/entities/message/ui/ScheduledDispatchNotice';
 import { MAX_RECIPIENTS, MESSAGE_MAX_LENGTH } from '@/shared/domain/limits';
 import type { ConnectionScope } from '@/shared/domain/scope';
 import { useFieldError } from '@/shared/i18n/useFieldError';
@@ -61,6 +62,7 @@ export const MessageFormDialog = ({ scope, contacts, message, onClose }: Readonl
     onClose,
   });
   const showDelivery = !message || canChangeDelivery(message.status);
+  const isScheduling = showDelivery && delivery === 'schedule';
 
   return (
     <FormDialog
@@ -104,15 +106,18 @@ export const MessageFormDialog = ({ scope, contacts, message, onClose }: Readonl
           render={({ field }) => <DeliveryField value={field.value} onChange={field.onChange} />}
         />
       )}
-      {showDelivery && delivery === 'schedule' && (
-        <TextField
-          label={t('broadcast.scheduleLabel')}
-          type="datetime-local"
-          slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: toDateTimeLocalValue(new Date()) } }}
-          {...register('scheduledAt')}
-          error={Boolean(errors.scheduledAt)}
-          helperText={fieldError(errors.scheduledAt)}
-        />
+      {isScheduling && (
+        <>
+          <ScheduledDispatchNotice />
+          <TextField
+            label={t('broadcast.scheduleLabel')}
+            type="datetime-local"
+            slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: toDateTimeLocalValue(new Date()) } }}
+            {...register('scheduledAt')}
+            error={Boolean(errors.scheduledAt)}
+            helperText={fieldError(errors.scheduledAt)}
+          />
+        </>
       )}
     </FormDialog>
   );

@@ -11,6 +11,7 @@ const envSchema = z.object({
   VITE_FIREBASE_APP_ID: requiredText,
   VITE_USE_EMULATORS: z.enum(['true', 'false']).default('false'),
   VITE_DEFAULT_LANG: z.string().optional(),
+  VITE_SCHEDULED_DISPATCH_ENABLED: z.enum(['true', 'false']).default('false'),
 });
 
 const parsed = envSchema.safeParse(import.meta.env);
@@ -33,3 +34,4 @@ export const FIREBASE_OPTIONS = {
 
 export const USE_EMULATORS = env.VITE_USE_EMULATORS === 'true';
 export const DEFAULT_LANG_SETTING = env.VITE_DEFAULT_LANG;
+export const SCHEDULED_DISPATCH_ENABLED = env.VITE_SCHEDULED_DISPATCH_ENABLED === 'true';

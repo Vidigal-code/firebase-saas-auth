@@ -10,6 +10,7 @@ import { countByFilter, filterMessages, type MessageFilter } from '@/entities/me
 import type { Message } from '@/entities/message/model/types';
 import { useMessages } from '@/entities/message/model/useMessages';
 import { MessageCard } from '@/entities/message/ui/MessageCard';
+import { ScheduledDispatchNotice } from '@/entities/message/ui/ScheduledDispatchNotice';
 import { MessageFormDialog } from '@/features/message-composer/ui/MessageFormDialog';
 import { MessageFilterTabs } from '@/features/message-filter/MessageFilterTabs';
 import { buildContactsPath } from '@/shared/config/routes';
@@ -71,6 +72,7 @@ export const BroadcastPage = () => {
             {t('broadcast.noContacts')}
           </Alert>
         )}
+        <ScheduledDispatchNotice className="mb-4" />
         <MessageFilterTabs value={filter} counts={counts} onChange={setFilter} />
         <PaginatedGrid
           key={filter}

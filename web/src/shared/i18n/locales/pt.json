@@ -23,7 +23,11 @@
     "deleteError": "Não foi possível excluir. Tente novamente.",
     "previousPage": "Página anterior",
     "pagination": "Paginação",
-    "creator": "Desenvolvido por"
+    "creator": "Desenvolvido por",
+    "openNavigation": "Abrir menu de navegação",
+    "closeNavigation": "Fechar menu de navegação",
+    "navigationMenu": "Menu",
+    "theme": "Tema"
   },
   "validation": {
     "required": "Campo obrigatório.",
@@ -180,7 +184,8 @@
     "removedContact": "Contato removido",
     "noContacts": "Cadastre contatos nesta conexão antes de enviar mensagens.",
     "goToContacts": "Ir para contatos",
-    "sentEditHint": "Esta mensagem já foi enviada: apenas o texto e os contatos podem ser editados."
+    "sentEditHint": "Esta mensagem já foi enviada: apenas o texto e os contatos podem ser editados.",
+    "dispatchInactive": "Disparo automático inativo neste ambiente: a Cloud Function que muda mensagens de \"Agendada\" para \"Enviada\" já está implementada e testada, mas não foi publicada (requer o plano Blaze do Firebase). Mensagens agendadas permanecem como \"Agendada\"; use \"Editar → Enviar agora\" para enviá-las."
   },
   "notFound": {
     "code": "404",

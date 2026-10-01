@@ -23,7 +23,11 @@
     "deleteError": "No fue posible eliminar. Inténtalo de nuevo.",
     "previousPage": "Página anterior",
     "pagination": "Paginación",
-    "creator": "Desarrollado por"
+    "creator": "Desarrollado por",
+    "openNavigation": "Abrir menú de navegación",
+    "closeNavigation": "Cerrar menú de navegación",
+    "navigationMenu": "Menú",
+    "theme": "Tema"
   },
   "validation": {
     "required": "Campo obligatorio.",
@@ -180,7 +184,8 @@
     "removedContact": "Contacto eliminado",
     "noContacts": "Registra contactos en esta conexión antes de enviar mensajes.",
     "goToContacts": "Ir a contactos",
-    "sentEditHint": "Este mensaje ya fue enviado: solo se pueden editar el texto y los contactos."
+    "sentEditHint": "Este mensaje ya fue enviado: solo se pueden editar el texto y los contactos.",
+    "dispatchInactive": "Envío automático inactivo en este entorno: la Cloud Function que cambia los mensajes de \"Programado\" a \"Enviado\" ya está implementada y probada, pero no se publicó (requiere el plan Blaze de Firebase). Los mensajes programados siguen como \"Programado\"; usa \"Editar → Enviar ahora\" para enviarlos."
   },
   "notFound": {
     "code": "404",
