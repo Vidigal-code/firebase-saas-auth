@@ -1,24 +1,143 @@
 rules_version = '2';
+
+// Multi-tenant isolation: every document carries the owner's uid in `clientId`.
+// Reads, queries and writes are only allowed when that owner is the caller, and
+// cross-collection references (connectionId) must point to a document the caller owns.
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isOwnedByCaller(data) {
+      return isSignedIn() && data.clientId == request.auth.uid;
+    }
+
+    function hasExactly(fields) {
+      return incoming().keys().hasAll(fields) && incoming().keys().hasOnly(fields);
+    }
+
+    function changesOnly(fields) {
+      return incoming().diff(existing()).affectedKeys().hasOnly(fields);
+    }
+
+    function isText(value, maxLength) {
+      return value is string && value.trim().size() > 0 && value.size() <= maxLength;
+    }
+
+    function isCreationStamped() {
+      return incoming().createdAt == request.time && incoming().updatedAt == request.time;
+    }
+
+    function isUpdateStamped() {
+      return incoming().updatedAt == request.time;
+    }
+
+    function ownsConnection(connectionId) {
+      let path = /databases/$(database)/documents/connections/$(connectionId);
+      return connectionId is string && exists(path) && get(path).data.clientId == request.auth.uid;
+    }
+
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && hasExactly(['email', 'createdAt'])
+        && incoming().email is string
+        && incoming().createdAt == request.time;
     }
 
     match /connections/{connectionId} {
-      allow read, update, delete: if request.auth != null && resource.data.clientId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.clientId == request.auth.uid;
+      function isValidConnection() {
+        return isText(incoming().name, 80);
+      }
+
+      allow read, delete: if isOwnedByCaller(existing());
+      allow create: if isOwnedByCaller(incoming())
+        && hasExactly(['clientId', 'name', 'createdAt', 'updatedAt'])
+        && isValidConnection()
+        && isCreationStamped();
+      allow update: if isOwnedByCaller(existing())
+        && changesOnly(['name', 'updatedAt'])
+        && isValidConnection()
+        && isUpdateStamped();
     }
 
     match /contacts/{contactId} {
-      allow read, update, delete: if request.auth != null && resource.data.clientId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.clientId == request.auth.uid;
+      function isValidContact() {
+        return isText(incoming().name, 80)
+          && incoming().phone is string
+          && incoming().phone.matches('^\\+?[1-9][0-9]{9,14}$');
+      }
+
+      allow read, delete: if isOwnedByCaller(existing());
+      allow create: if isOwnedByCaller(incoming())
+        && hasExactly(['clientId', 'connectionId', 'name', 'phone', 'createdAt', 'updatedAt'])
+        && ownsConnection(incoming().connectionId)
+        && isValidContact()
+        && isCreationStamped();
+      allow update: if isOwnedByCaller(existing())
+        && changesOnly(['name', 'phone', 'updatedAt'])
+        && isValidContact()
+        && isUpdateStamped();
     }
 
     match /messages/{messageId} {
-      allow read, update, delete: if request.auth != null && resource.data.clientId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.clientId == request.auth.uid;
+      function isValidContent() {
+        return isText(incoming().content, 1000)
+          && incoming().contactIds is list
+          && incoming().contactIds.size() > 0
+          && incoming().contactIds.size() <= 200;
+      }
+
+      function isSentNow() {
+        return incoming().status == 'sent'
+          && incoming().scheduledAt == null
+          && incoming().sentAt == request.time;
+      }
+
+      function isScheduledForFuture() {
+        return incoming().status == 'scheduled'
+          && incoming().scheduledAt is timestamp
+          && incoming().scheduledAt > request.time
+          && incoming().sentAt == null;
+      }
+
+      function hasValidDelivery() {
+        return isSentNow() || isScheduledForFuture();
+      }
+
+      function keepsDelivery() {
+        return !incoming().diff(existing()).affectedKeys().hasAny(['status', 'scheduledAt', 'sentAt']);
+      }
+
+      // Scheduled messages may be rescheduled or sent right away; sent messages keep
+      // their delivery data. Only the Cloud Function (Admin SDK) flips scheduled to sent on time.
+      function isAllowedDeliveryChange() {
+        return existing().status == 'scheduled' ? hasValidDelivery() : keepsDelivery();
+      }
+
+      allow read, delete: if isOwnedByCaller(existing());
+      allow create: if isOwnedByCaller(incoming())
+        && hasExactly(['clientId', 'connectionId', 'contactIds', 'content', 'status', 'scheduledAt', 'sentAt', 'createdAt', 'updatedAt'])
+        && ownsConnection(incoming().connectionId)
+        && isValidContent()
+        && hasValidDelivery()
+        && isCreationStamped();
+      allow update: if isOwnedByCaller(existing())
+        && changesOnly(['contactIds', 'content', 'status', 'scheduledAt', 'sentAt', 'updatedAt'])
+        && isValidContent()
+        && isAllowedDeliveryChange()
+        && isUpdateStamped();
     }
   }
 }
