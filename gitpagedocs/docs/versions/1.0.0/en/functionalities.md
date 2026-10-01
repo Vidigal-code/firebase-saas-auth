@@ -23,7 +23,7 @@
 - Select one or more contacts (search and "select all").
 - **Send now**: the message is saved as `sent` with the server time (simulated delivery).
 - **Schedule**: the message stays `scheduled` until the chosen time, which must be in the future.
-- **Automatic dispatch**: the `dispatchScheduledMessages` Cloud Function runs every minute and switches to `sent` every message whose time has come, even with the app closed. The update shows up on screen in real time.
+- **Automatic dispatch**: the `dispatchScheduledMessages` Cloud Function runs every minute and switches to `sent` every message whose time has come, even with the app closed. The update shows up on screen in real time. Implemented and tested, but **inactive in the published app** (flag `VITE_SCHEDULED_DISPATCH_ENABLED=false`): deploying Cloud Functions requires the Firebase Blaze plan. While the flag is off, the app shows that automatic dispatch is inactive, and scheduled messages can be sent with "Edit → Send now".
 - **All / Sent / Scheduled** filters with counters.
 - Editing: scheduled messages can change text, contacts, and time (or be sent now); sent messages can only change text and contacts.
 - Deletion with confirmation.
@@ -32,5 +32,5 @@
 
 - Interface in Portuguese, English, and Spanish (`?lang=en` also works).
 - Light and dark theme.
-- Responsive layout (full-screen dialogs on mobile).
+- Fully responsive: below 900px the top bar becomes a hamburger menu (navigation, account, language and theme); below 600px content is centered and stacked, and dialogs go full screen.
 - Feedback through notifications and loading, error, and empty states.

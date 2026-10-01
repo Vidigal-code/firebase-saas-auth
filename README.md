@@ -26,15 +26,54 @@ Aplicação **SaaS multi-tenant de Broadcast**: cada usuário cadastrado é um c
 | CRUD de conexões | `web/src/entities/connection`, `web/src/features/connection-editor` |
 | CRUD de contatos (nome, telefone) por conexão | `web/src/entities/contact`, `web/src/features/contact-editor` |
 | Broadcast: selecionar contatos, enviar agora, agendar, listar, filtrar, editar, excluir | `web/src/pages/broadcast`, `web/src/features/message-composer`, `web/src/features/message-filter` |
-| Agendada → Enviada no backend | `functions/src/messages/dispatchDueMessages.ts` (agenda a cada 1 min) |
+| Agendada → Enviada no backend | `functions/src/messages/dispatchDueMessages.ts` (agenda a cada 1 min). **Implementado e testado, mas inativo no app publicado**; veja abaixo |
 | Multi-tenant e isolamento | `firestore.rules` + `tests/firestore.rules.test.ts` |
 | MUI para componentes, Tailwind para estilo | `web/src/shared/theme`, `web/src/app/styles/global.css` |
+| 100% responsivo (extra) | menu hambúrguer abaixo de 900px (`web/src/widgets/app-shell/NavigationDrawer.tsx`); conteúdo centralizado e empilhado abaixo de 600px |
 | Paradigma funcional (sem classes) | todo o código |
 | Tempo real | `web/src/shared/firebase/useRealtimeQuery.ts` (`onSnapshot`) |
 | Vite | `web/vite.config.ts` |
 | Sem subcoleções | coleções planas `connections`, `contacts`, `messages`, `users` |
 | `/functions` e `/web` | estrutura do repositório |
 | Firebase Hosting | `firebase.json` + deploy automático |
+
+### ⚠️ Disparo automático: implementado, mas inativo (feature flag)
+
+A mudança automática de **"Agendada" para "Enviada"** é feita pela Cloud Function `dispatchScheduledMessages` (`functions/src/messages/dispatchDueMessages.ts`). Ela roda a cada minuto, está **implementada e coberta por testes** (`functions/test/dispatchDueMessages.test.ts`, no emulador do Firestore), mas **está desativada no ambiente publicado**.
+
+O motivo é que publicar Cloud Functions exige o plano **Blaze** (pago por uso) do Firebase, e o projeto `fir-saas-auth-4a138` está no plano gratuito (Spark).
+
+A funcionalidade fica atrás da flag `VITE_SCHEDULED_DISPATCH_ENABLED`, hoje **`false`**:
+
+| Com a flag `false` (atual) | Com a flag `true` |
+|---|---|
+| O deploy publica só regras, índices e Hosting | O deploy também publica as Cloud Functions |
+| O app avisa que o disparo automático está inativo (na tela de Broadcast e ao agendar) | O aviso some e as mensagens agendadas viram "Enviada" no horário, mesmo com o app fechado |
+| Mensagens agendadas continuam "Agendada"; dá para enviá-las em **Editar → Enviar agora** | Fluxo completo do desafio |
+
+As funções de limpeza em cascata (`cleanupDeletedConnection` e `detachDeletedContact`) também são Cloud Functions e seguem a mesma regra. Sem elas, excluir uma conexão não apaga automaticamente os contatos e as mensagens dela. Esses dados continuam isolados pelas regras e só o próprio cliente os vê.
+
+#### O que é o plano Blaze e quanto custa
+
+O **Blaze** é o plano "pague pelo que usar" do Firebase. Ele **mantém as mesmas cotas gratuitas do plano Spark** e só cobra o que passar delas, mas exige uma conta de faturamento (cartão de crédito). Contas novas costumam receber crédito promocional ao fazer o upgrade.
+
+Para este app, o custo esperado é **zero**, porque o uso fica bem abaixo das cotas gratuitas mensais (valores de [firebase.google.com/pricing](https://firebase.google.com/pricing); confira antes de ativar, eles podem mudar):
+
+| Recurso | Uso estimado | Gratuito por mês |
+|---|---|---|
+| Invocações de Cloud Functions | ~44 mil (agendador a cada 1 minuto) | 2 milhões |
+| Tempo de execução das Functions | poucos milhares de GB-s | 400 mil GB-s |
+| Imagens das Functions (Artifact Registry) | algumas centenas de MB | 500 MB |
+| Cloud Scheduler | 1 job | 3 jobs por conta de faturamento |
+| Firestore | uso de teste | 50 mil leituras e 20 mil gravações por dia |
+| Hosting | ~1,5 MB por visita | 360 MB/dia de tráfego |
+
+Recomendação: crie um alerta de orçamento em https://console.cloud.google.com/billing/budgets (por exemplo, US$ 1) para ser avisado por e-mail se aparecer algum custo.
+
+**Como ativar:**
+1. Ative o plano Blaze em https://console.firebase.google.com/project/fir-saas-auth-4a138/usage/details.
+2. Troque a flag para `"true"` em `web/.env` (deploy local) e na variável do repositório: `gh variable set VITE_SCHEDULED_DISPATCH_ENABLED --body true`.
+3. Publique: `npm run deploy:functions && npm run deploy`, ou faça um push na `main` com o deploy automático configurado.
 
 ### Modelo de dados
 
@@ -67,13 +106,14 @@ npm --prefix web run dev:emulators
 | `npm run lint` / `npm run typecheck` | ESLint e TypeScript em todo o projeto |
 | `npm test` | regras do Firestore, Functions, testes unitários e de integração do web (com emuladores) |
 | `npm run build` | build das Functions e do web |
-| `npm run deploy` | regras, índices, Functions e Hosting |
+| `npm run deploy` | regras, índices e Hosting |
+| `npm run deploy:functions` | Cloud Functions (requer o plano Blaze) |
 
 Pré-requisitos: Node 22, Java 21+ (emulador do Firestore), Firebase CLI e projeto no plano Blaze (Functions agendadas).
 
 ### Deploy automático
 
-`.github/workflows/firebase-deploy.yml`: a cada push na `main` roda lint, typecheck, testes e build e depois faz o deploy. Configure no GitHub as variables `VITE_FIREBASE_*` e o secret `FIREBASE_SERVICE_ACCOUNT` (JSON de uma conta de serviço com *Firebase Admin*, *Cloud Functions Admin*, *Service Account User* e *Cloud Scheduler Admin*).
+`.github/workflows/firebase-deploy.yml`: a cada push na `main` roda lint, typecheck, testes e build e depois faz o deploy (as Cloud Functions só entram quando a variável `VITE_SCHEDULED_DISPATCH_ENABLED` é `true`). O deploy só roda quando o secret existe. Configure no GitHub as variables `VITE_FIREBASE_*` e o secret `FIREBASE_SERVICE_ACCOUNT` (JSON de uma conta de serviço com *Firebase Admin*, *Cloud Functions Admin*, *Service Account User* e *Cloud Scheduler Admin*).
 
 ### Qualidade
 
@@ -93,7 +133,8 @@ Multi-tenant **broadcast SaaS** built with React 19, TypeScript, Vite 8, MUI 9, 
 - **Isolation**: `firestore.rules` only allows reads, queries and writes on documents whose `clientId` is the caller's uid, checks that referenced connections belong to the caller, keeps `clientId`/`connectionId` immutable, and validates schema and message lifecycle. 25 rule tests run on the emulator.
 - **Real time**: every list uses Firestore `onSnapshot` listeners.
 - **Run locally**: `npm run install:all`, `cp web/.env.example web/.env`, `npm run emulators`, `npm --prefix web run dev:emulators`.
-- **Test / build / deploy**: `npm test`, `npm run build`, `npm run deploy`; GitHub Actions deploys on every push to `main`.
+- **Test / build / deploy**: `npm test`, `npm run build`, `npm run deploy` (plus `npm run deploy:functions`); GitHub Actions deploys on every push to `main`.
+- **Feature flag**: the scheduled dispatch Cloud Function is implemented and tested but inactive in the published app (`VITE_SCHEDULED_DISPATCH_ENABLED=false`), because deploying Cloud Functions requires the Firebase Blaze plan. The app shows a notice while it is off.
 
 </details>
 

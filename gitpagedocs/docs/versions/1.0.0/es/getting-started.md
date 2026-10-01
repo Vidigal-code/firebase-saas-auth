@@ -37,6 +37,7 @@ La aplicación queda en `http://localhost:5173` y la interfaz de los emuladores 
 | `npm run typecheck` | TypeScript de las pruebas de reglas, functions y web |
 | `npm test` | Reglas de Firestore, Cloud Functions, pruebas unitarias y de integración del web |
 | `npm run build` | Build de las Functions y del web |
-| `npm run deploy` | Deploy de reglas, índices, Functions y Hosting |
+| `npm run deploy` | Deploy de reglas, índices y Hosting |
+| `npm run deploy:functions` | Deploy de las Cloud Functions (requiere el plan Blaze) |
 
 Las pruebas que usan emuladores se ejecutan mediante `scripts/with-emulators.mjs`, que levanta los emuladores necesarios y los detiene al final.

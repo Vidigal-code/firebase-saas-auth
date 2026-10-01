@@ -23,7 +23,7 @@
 - Selección de uno o varios contactos (búsqueda y "seleccionar todos").
 - **Enviar ahora**: el mensaje se guarda como `sent` con la hora del servidor (simulación del envío).
 - **Programar**: el mensaje queda `scheduled` hasta la hora elegida, que debe estar en el futuro.
-- **Disparo automático**: la Cloud Function `dispatchScheduledMessages` se ejecuta cada minuto y cambia a `sent` todo mensaje cuya hora llegó, incluso con la app cerrada. La actualización aparece en pantalla en tiempo real.
+- **Disparo automático**: la Cloud Function `dispatchScheduledMessages` se ejecuta cada minuto y cambia a `sent` todo mensaje cuya hora llegó, incluso con la app cerrada. La actualización aparece en pantalla en tiempo real. Implementada y probada, pero **inactiva en la app publicada** (flag `VITE_SCHEDULED_DISPATCH_ENABLED=false`): publicar Cloud Functions requiere el plan Blaze de Firebase. Mientras la flag está apagada, la app avisa que el envío automático está inactivo y los mensajes programados se pueden enviar con "Editar → Enviar ahora".
 - Filtros **Todos / Enviados / Programados** con contadores.
 - Edición: los mensajes programados pueden cambiar texto, contactos y hora (o enviarse ahora); los mensajes enviados solo cambian texto y contactos.
 - Eliminación con confirmación.
@@ -32,5 +32,5 @@
 
 - Interfaz en portugués, inglés y español (`?lang=en` también funciona).
 - Tema claro y oscuro.
-- Diseño responsivo (diálogos a pantalla completa en el móvil).
+- 100% responsivo: por debajo de 900px la barra superior se convierte en un menú hamburguesa (navegación, cuenta, idioma y tema); por debajo de 600px el contenido queda centrado y apilado, y los diálogos ocupan toda la pantalla.
 - Feedback con notificaciones y estados de carga, error y vacío.

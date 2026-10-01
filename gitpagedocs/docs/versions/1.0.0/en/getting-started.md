@@ -37,6 +37,7 @@ The app runs at `http://localhost:5173` and the emulator UI at `http://localhost
 | `npm run typecheck` | TypeScript for rules tests, functions, and web |
 | `npm test` | Firestore rules, Cloud Functions, and web unit and integration tests |
 | `npm run build` | Builds Functions and web |
-| `npm run deploy` | Deploys rules, indexes, Functions, and Hosting |
+| `npm run deploy` | Deploys rules, indexes, and Hosting |
+| `npm run deploy:functions` | Deploys the Cloud Functions (requires the Blaze plan) |
 
 Tests that need emulators run through `scripts/with-emulators.mjs`, which starts the required emulators and shuts them down at the end.

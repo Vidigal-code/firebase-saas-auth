@@ -14,7 +14,7 @@ Aplicación **SaaS multi-tenant de Broadcast** construida con React, TypeScript,
 - **Conexiones**: CRUD completo; cada cliente ve solo sus propias conexiones.
 - **Contactos**: CRUD de nombre y teléfono por conexión.
 - **Broadcast**: selección de uno o varios contactos, envío inmediato o programado, edición, eliminación y filtro entre enviados y programados.
-- **Programación en el backend**: la Cloud Function `dispatchScheduledMessages` cambia el estado de "Programado" a "Enviado" a la hora definida, sin depender de que la app esté abierta.
+- **Programación en el backend**: la Cloud Function `dispatchScheduledMessages` cambia el estado de "Programado" a "Enviado" a la hora definida, sin depender de que la app esté abierta. Implementada y probada, pero **inactiva en la app publicada** (flag `VITE_SCHEDULED_DISPATCH_ENABLED=false`): publicar Cloud Functions requiere el plan Blaze de Firebase. Mientras la flag está apagada, la app avisa que el envío automático está inactivo y los mensajes programados se pueden enviar con "Editar → Enviar ahora".
 - **Tiempo real**: todas las listas usan listeners `onSnapshot` de Firestore.
 - **Aislamiento entre clientes**: garantizado por las reglas de Firestore y cubierto por pruebas automatizadas.
 - **i18n y temas**: portugués, inglés y español; modo claro y oscuro.

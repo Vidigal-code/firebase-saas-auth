@@ -12,6 +12,7 @@
 | `VITE_FIREBASE_APP_ID` | App ID |
 | `VITE_USE_EMULATORS` | `true` conecta Auth e Firestore aos emuladores locais |
 | `VITE_DEFAULT_LANG` | Idioma inicial: `pt`, `en` ou `es` |
+| `VITE_SCHEDULED_DISPATCH_ENABLED` | Feature flag do disparo automático: `true` só depois de publicar as Cloud Functions (plano Blaze). Hoje `false` |
 
 As variáveis são validadas com Zod na inicialização: se faltar alguma, o app informa qual.
 
@@ -19,7 +20,8 @@ As variáveis são validadas com Zod na inicialização: se faltar alguma, o app
 
 ```bash
 firebase login
-npm run deploy
+npm run deploy            # regras, índices e Hosting
+npm run deploy:functions  # Cloud Functions (requer o plano Blaze)
 ```
 
 ## Deploy automático (GitHub Actions)
@@ -27,7 +29,7 @@ npm run deploy
 O workflow `.github/workflows/firebase-deploy.yml` roda a cada push na `main`:
 
 1. **quality**: lint, typecheck, testes (regras, Functions, web unitário e integração com emuladores) e build.
-2. **deploy**: publica regras e índices do Firestore, Cloud Functions e Hosting.
+2. **deploy**: publica regras e índices do Firestore e Hosting; as Cloud Functions só entram quando a variável `VITE_SCHEDULED_DISPATCH_ENABLED` do repositório é `true`. Só roda quando o secret `FIREBASE_SERVICE_ACCOUNT` existe.
 
 Configuração necessária no GitHub:
 
@@ -35,3 +37,9 @@ Configuração necessária no GitHub:
 - **Secret** `FIREBASE_SERVICE_ACCOUNT`: JSON de uma conta de serviço do projeto com os papéis *Firebase Admin*, *Cloud Functions Admin*, *Service Account User* e *Cloud Scheduler Admin*.
 
 Pull requests executam apenas o job de qualidade.
+
+## Plano Blaze (Cloud Functions)
+
+Publicar Cloud Functions exige o plano **Blaze** (pague pelo que usar) do Firebase. Ele mantém as cotas gratuitas do plano Spark e só cobra o excedente, mas pede uma conta de faturamento (cartão). Para o uso deste app (~44 mil invocações por mês para 2 milhões gratuitas, 1 job do Cloud Scheduler para 3 gratuitos, algumas centenas de MB de imagens para 500 MB gratuitos), o custo esperado é zero. Crie um alerta de orçamento no Google Cloud para ser avisado de qualquer custo.
+
+Enquanto o projeto estiver no Spark, a flag `VITE_SCHEDULED_DISPATCH_ENABLED` fica `false`: as Functions estão implementadas e testadas, mas não são publicadas, e o app avisa que o disparo automático está inativo. Para ativar: faça o upgrade em `console.firebase.google.com/project/<projeto>/usage/details`, troque a flag para `true` e rode `npm run deploy:functions`.

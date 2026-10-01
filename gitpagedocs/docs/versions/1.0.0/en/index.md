@@ -14,7 +14,7 @@ A **multi-tenant SaaS Broadcast** application built with React, TypeScript, Mate
 - **Connections**: full CRUD; each client sees only their own connections.
 - **Contacts**: CRUD for name and phone per connection.
 - **Broadcast**: select one or more contacts, send now or schedule, edit, delete, and filter between sent and scheduled.
-- **Backend scheduling**: the `dispatchScheduledMessages` Cloud Function changes the status from "Scheduled" to "Sent" at the set time, without needing the app to be open.
+- **Backend scheduling**: the `dispatchScheduledMessages` Cloud Function changes the status from "Scheduled" to "Sent" at the set time, without needing the app to be open. Implemented and tested, but **inactive in the published app** (flag `VITE_SCHEDULED_DISPATCH_ENABLED=false`): deploying Cloud Functions requires the Firebase Blaze plan. While the flag is off, the app shows that automatic dispatch is inactive, and scheduled messages can be sent with "Edit → Send now".
 - **Real time**: every list uses Firestore `onSnapshot` listeners.
 - **Client isolation**: enforced by Firestore rules and covered by automated tests.
 - **i18n and themes**: Portuguese, English, and Spanish; light and dark mode.
