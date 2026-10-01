@@ -1,90 +1,62 @@
-import { useNavigate } from 'react-router-dom';
-import { Button, Box } from '@mui/material';
-import { FiPlus, FiLink } from 'react-icons/fi';
-import { useConnections } from '@/entities/connection/model/hooks';
+import AddRounded from '@mui/icons-material/AddRounded';
+import HubOutlined from '@mui/icons-material/HubOutlined';
+import Button from '@mui/material/Button';
+import { deleteConnection } from '@/entities/connection/api/connectionsRepository';
+import type { Connection } from '@/entities/connection/model/types';
+import { useConnections } from '@/entities/connection/model/useConnections';
 import { ConnectionCard } from '@/entities/connection/ui/ConnectionCard';
-import { ConnectionDialog } from '@/features/connection/ui/ConnectionDialog';
-import { useConnectionCrud } from '@/features/connection/hooks/useConnectionCrud';
-import { usePagination } from '@/shared/hooks/usePagination';
-import { useLang } from '@/shared/hooks/useLang';
-import { PageLoader } from '@/shared/ui/PageLoader';
-import { PageHeader } from '@/shared/ui/PageHeader';
-import { EmptyState } from '@/shared/ui/EmptyState';
-import { PaginationBar } from '@/shared/ui/PaginationBar';
+import { ConnectionFormDialog } from '@/features/connection-editor/ConnectionFormDialog';
+import { useEditorState } from '@/shared/hooks/useEditorState';
+import { useTranslation } from '@/shared/i18n/useTranslation';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
-
-const GRID_COLUMNS = { xs: '1fr', sm: 'repeat(2, 1fr)', xl: 'repeat(3, 1fr)' };
-
-const buildContactsPath = (id: string) => `/connections/${id}/contacts`;
-const buildMessagesPath = (id: string) => `/connections/${id}/messages`;
+import { EmptyState } from '@/shared/ui/EmptyState';
+import { PageHeader } from '@/shared/ui/PageHeader';
+import { PaginatedGrid } from '@/shared/ui/PaginatedGrid';
+import { QueryBoundary } from '@/shared/ui/QueryBoundary';
+import { useDeleteConfirmation } from '@/shared/ui/useDeleteConfirmation';
 
 export const ConnectionsPage = () => {
-  const { connections, loading } = useConnections();
-  const navigate = useNavigate();
-  const crud = useConnectionCrud();
-  const { page, pageCount, pageItems, hasPagination, goToPage } = usePagination(connections);
-  const { t } = useLang();
-
-  if (loading) return <PageLoader />;
-
-  const hasConnections = connections.length > 0;
+  const { t } = useTranslation();
+  const { status, data: connections } = useConnections();
+  const editor = useEditorState<Connection>();
+  const deletion = useDeleteConfirmation<Connection>({
+    remove: (connection) => deleteConnection(connection.id),
+    describe: (connection) => ({
+      title: t('connections.deleteTitle'),
+      message: t('connections.deleteMessage', { name: connection.name }),
+    }),
+    successMessage: t('connections.deleted'),
+  });
 
   return (
-    <Box>
+    <>
       <PageHeader
-        title={t.connections.title}
-        subtitle={t.connections.subtitle.replace('{count}', String(connections.length))}
-        icon={<FiLink />}
-        action={
-          <Button variant="contained" startIcon={<FiPlus size={16} />} onClick={crud.openCreate} sx={{ width: { xs: '100%', sm: 'auto' } }}>
-            {t.connections.newConnection}
+        title={t('connections.title')}
+        subtitle={t('connections.subtitle', { count: connections.length })}
+        actions={
+          <Button variant="contained" startIcon={<AddRounded />} onClick={editor.openCreate}>
+            {t('connections.new')}
           </Button>
         }
       />
-
-      {!hasConnections && (
-        <EmptyState icon={<FiLink />} message={t.connections.empty} />
-      )}
-
-      {hasConnections && (
-        <Box sx={{ display: 'grid', gridTemplateColumns: GRID_COLUMNS, gap: 3 }}>
-          {pageItems.map(conn => (
-            <ConnectionCard
-              key={conn.id}
-              name={conn.name}
-              onEdit={() => crud.openEdit(conn.id, conn.name)}
-              onDelete={() => crud.requestDelete(conn.id, conn.name)}
-              onContacts={() => navigate(buildContactsPath(conn.id))}
-              onMessages={() => navigate(buildMessagesPath(conn.id))}
+      <QueryBoundary status={status}>
+        <PaginatedGrid
+          items={connections}
+          getKey={(connection) => connection.id}
+          renderItem={(connection) => (
+            <ConnectionCard connection={connection} onEdit={editor.openEdit} onDelete={deletion.request} />
+          )}
+          empty={
+            <EmptyState
+              icon={<HubOutlined fontSize="inherit" />}
+              title={t('connections.empty')}
+              description={t('connections.emptyHint')}
             />
-          ))}
-        </Box>
-      )}
-
-      <PaginationBar
-        page={page}
-        pageCount={pageCount}
-        visible={hasPagination}
-        onChange={goToPage}
-      />
-
-      <ConnectionDialog
-        open={crud.dialog.open}
-        isEdit={!!crud.dialog.editId}
-        name={crud.dialog.name}
-        isPending={crud.isPending}
-        onNameChange={crud.setName}
-        onClose={crud.closeDialog}
-        onSave={crud.save}
-      />
-
-      <ConfirmDialog
-        open={crud.confirm.confirmState.open}
-        title={crud.confirm.confirmState.title}
-        message={crud.confirm.confirmState.message}
-        onConfirm={crud.confirm.handleConfirm}
-        onCancel={crud.confirm.closeConfirm}
-      />
-    </Box>
+          }
+        />
+      </QueryBoundary>
+      {editor.state.open && <ConnectionFormDialog connection={editor.state.target} onClose={editor.close} />}
+      <ConfirmDialog {...deletion.dialogProps} />
+    </>
   );
 };

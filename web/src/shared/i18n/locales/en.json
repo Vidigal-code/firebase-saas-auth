@@ -1,0 +1,196 @@
+{
+  "common": {
+    "appName": "BroadcastApp",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading...",
+    "account": "Account",
+    "changePassword": "Change password",
+    "logout": "Sign out",
+    "login": "Sign in",
+    "register": "Create account",
+    "openMenu": "Open account menu",
+    "lightMode": "Switch to light theme",
+    "darkMode": "Switch to dark theme",
+    "language": "Language",
+    "loadError": "Could not load the data. Please try again.",
+    "saveError": "Could not save. Check the data and try again.",
+    "deleteError": "Could not delete. Please try again.",
+    "previousPage": "Previous page",
+    "pagination": "Pagination",
+    "creator": "Built by"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "maxLength": "Use at most {max} characters.",
+    "email": "Enter a valid email.",
+    "passwordPolicy": "At least 8 characters, with uppercase, lowercase, number and special character.",
+    "phone": "Enter a valid phone with area code (10 to 15 digits), e.g. +1 415 555 0100.",
+    "recipientsRequired": "Select at least one contact.",
+    "recipientsMax": "Select at most {max} contacts.",
+    "scheduleRequired": "Enter the delivery date and time.",
+    "scheduleInPast": "Choose a date and time in the future."
+  },
+  "auth": {
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to manage your connections and messages.",
+    "registerTitle": "Create your account",
+    "registerSubtitle": "Each account is an isolated BroadcastApp client.",
+    "email": "Email",
+    "password": "Password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "passwordHint": "8+ characters with uppercase, lowercase, number and symbol.",
+    "loginButton": "Sign in",
+    "loginPending": "Signing in...",
+    "registerButton": "Create account",
+    "registerPending": "Creating account...",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "changePasswordTitle": "Change password",
+    "changePasswordButton": "Update password",
+    "passwordChanged": "Password updated successfully.",
+    "errors": {
+      "invalidCredentials": "Incorrect email or password.",
+      "emailInUse": "This email is already registered.",
+      "weakPassword": "The password is too weak.",
+      "tooManyRequests": "Too many attempts. Wait a few minutes.",
+      "network": "Connection failed. Check your internet.",
+      "unknown": "The operation could not be completed. Please try again."
+    }
+  },
+  "home": {
+    "badge": "Real-time multi-tenant broadcast",
+    "title": "Send messages to your contacts",
+    "highlight": "now or right on time",
+    "description": "Organize contacts by connection, send messages immediately or schedule them. Scheduled delivery runs on the server, even with the app closed.",
+    "ctaPrimary": "Start for free",
+    "ctaSecondary": "I already have an account",
+    "featuresTitle": "Everything your broadcast needs",
+    "features": {
+      "connections": {
+        "title": "Connections",
+        "description": "Group your contacts and messages into independent connections."
+      },
+      "contacts": {
+        "title": "Contacts",
+        "description": "Create, edit and remove contacts with name and phone."
+      },
+      "broadcast": {
+        "title": "Bulk sending",
+        "description": "Select one or many contacts and send the same message."
+      },
+      "scheduling": {
+        "title": "Scheduling",
+        "description": "A Cloud Function marks the message as sent at the chosen time."
+      },
+      "isolation": {
+        "title": "Isolated data",
+        "description": "Firestore rules ensure each client only sees its own data."
+      },
+      "realtime": {
+        "title": "Real time",
+        "description": "Lists update instantly through Firestore listeners."
+      }
+    }
+  },
+  "connections": {
+    "title": "Connections",
+    "subtitle": "{count} connection(s)",
+    "new": "New connection",
+    "empty": "You don't have any connections yet.",
+    "emptyHint": "Create your first connection to add contacts and send messages.",
+    "nameLabel": "Connection name",
+    "createTitle": "New connection",
+    "editTitle": "Edit connection",
+    "deleteTitle": "Delete connection",
+    "deleteMessage": "Delete \"{name}\"? Its contacts and messages will be removed as well.",
+    "created": "Connection created.",
+    "updated": "Connection updated.",
+    "deleted": "Connection deleted.",
+    "openContacts": "Contacts",
+    "openBroadcast": "Broadcast",
+    "createdAt": "Created on {date}",
+    "notFound": "Connection not found",
+    "notFoundHint": "It may have been deleted or belongs to another account.",
+    "backToList": "Back to connections"
+  },
+  "contacts": {
+    "title": "Contacts",
+    "subtitle": "{count} contact(s) in this connection",
+    "new": "New contact",
+    "empty": "No contacts in this connection.",
+    "emptyHint": "Add contacts to be able to send messages.",
+    "nameLabel": "Name",
+    "phoneLabel": "Phone",
+    "createTitle": "New contact",
+    "editTitle": "Edit contact",
+    "deleteTitle": "Delete contact",
+    "deleteMessage": "Delete \"{name}\"? It will also be removed from message recipients.",
+    "created": "Contact added.",
+    "updated": "Contact updated.",
+    "deleted": "Contact deleted."
+  },
+  "broadcast": {
+    "title": "Broadcast",
+    "subtitle": "{count} message(s) in this connection",
+    "new": "New message",
+    "empty": "No messages here.",
+    "emptyHint": "Create a message to send now or schedule it.",
+    "filterLabel": "Filter messages",
+    "filters": {
+      "all": "All",
+      "sent": "Sent",
+      "scheduled": "Scheduled"
+    },
+    "status": {
+      "sent": "Sent",
+      "scheduled": "Scheduled"
+    },
+    "recipientsLabel": "Contacts",
+    "recipientsPlaceholder": "Search contacts",
+    "selectAll": "Select all",
+    "clearSelection": "Clear selection",
+    "contentLabel": "Message",
+    "contentCounter": "{count}/{max}",
+    "deliveryLabel": "When should it be sent?",
+    "deliveryNow": "Send now",
+    "deliverySchedule": "Schedule",
+    "scheduleLabel": "Date and time",
+    "sendNow": "Send now",
+    "schedule": "Schedule",
+    "saveChanges": "Save changes",
+    "createTitle": "New message",
+    "editTitle": "Edit message",
+    "deleteTitle": "Delete message",
+    "deleteMessage": "Delete this message? This action cannot be undone.",
+    "sentToast": "Message sent.",
+    "scheduledToast": "Message scheduled.",
+    "updated": "Message updated.",
+    "deleted": "Message deleted.",
+    "recipientsCount": "{count} contact(s)",
+    "scheduledFor": "Scheduled for {date}",
+    "sentAt": "Sent on {date}",
+    "noRecipients": "No recipients",
+    "removedContact": "Removed contact",
+    "noContacts": "Add contacts to this connection before sending messages.",
+    "goToContacts": "Go to contacts",
+    "sentEditHint": "This message was already sent: only its text and contacts can be edited."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "description": "The address you requested does not exist or was moved.",
+    "back": "Back to start"
+  },
+  "lang": {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  }
+}

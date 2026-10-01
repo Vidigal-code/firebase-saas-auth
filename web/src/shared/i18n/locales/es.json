@@ -1,0 +1,196 @@
+{
+  "common": {
+    "appName": "BroadcastApp",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "deleting": "Eliminando...",
+    "edit": "Editar",
+    "back": "Volver",
+    "loading": "Cargando...",
+    "account": "Cuenta",
+    "changePassword": "Cambiar contraseña",
+    "logout": "Cerrar sesión",
+    "login": "Iniciar sesión",
+    "register": "Crear cuenta",
+    "openMenu": "Abrir menú de la cuenta",
+    "lightMode": "Activar tema claro",
+    "darkMode": "Activar tema oscuro",
+    "language": "Idioma",
+    "loadError": "No fue posible cargar los datos. Inténtalo de nuevo.",
+    "saveError": "No fue posible guardar. Revisa los datos e inténtalo de nuevo.",
+    "deleteError": "No fue posible eliminar. Inténtalo de nuevo.",
+    "previousPage": "Página anterior",
+    "pagination": "Paginación",
+    "creator": "Desarrollado por"
+  },
+  "validation": {
+    "required": "Campo obligatorio.",
+    "maxLength": "Usa como máximo {max} caracteres.",
+    "email": "Ingresa un correo válido.",
+    "passwordPolicy": "Mínimo 8 caracteres, con mayúscula, minúscula, número y carácter especial.",
+    "phone": "Ingresa un teléfono válido con código de área (10 a 15 dígitos), ej.: +34 612 345 678.",
+    "recipientsRequired": "Selecciona al menos un contacto.",
+    "recipientsMax": "Selecciona como máximo {max} contactos.",
+    "scheduleRequired": "Indica la fecha y la hora del envío.",
+    "scheduleInPast": "Elige una fecha y hora en el futuro."
+  },
+  "auth": {
+    "loginTitle": "Bienvenido de nuevo",
+    "loginSubtitle": "Inicia sesión para gestionar tus conexiones y mensajes.",
+    "registerTitle": "Crea tu cuenta",
+    "registerSubtitle": "Cada cuenta es un cliente aislado de BroadcastApp.",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "passwordHint": "8+ caracteres con mayúscula, minúscula, número y símbolo.",
+    "loginButton": "Iniciar sesión",
+    "loginPending": "Iniciando sesión...",
+    "registerButton": "Crear cuenta",
+    "registerPending": "Creando cuenta...",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "changePasswordTitle": "Cambiar contraseña",
+    "changePasswordButton": "Actualizar contraseña",
+    "passwordChanged": "Contraseña actualizada correctamente.",
+    "errors": {
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "emailInUse": "Este correo ya está registrado.",
+      "weakPassword": "La contraseña es demasiado débil.",
+      "tooManyRequests": "Demasiados intentos. Espera unos minutos.",
+      "network": "Error de conexión. Revisa tu internet.",
+      "unknown": "No fue posible completar la operación. Inténtalo de nuevo."
+    }
+  },
+  "home": {
+    "badge": "Broadcast multi-tenant en tiempo real",
+    "title": "Envía mensajes a tus contactos",
+    "highlight": "ahora o a la hora exacta",
+    "description": "Organiza contactos por conexión, envía mensajes al instante o prográmalos. El envío programado ocurre en el servidor, incluso con la app cerrada.",
+    "ctaPrimary": "Empezar gratis",
+    "ctaSecondary": "Ya tengo cuenta",
+    "featuresTitle": "Todo lo que tu broadcast necesita",
+    "features": {
+      "connections": {
+        "title": "Conexiones",
+        "description": "Agrupa tus contactos y mensajes en conexiones independientes."
+      },
+      "contacts": {
+        "title": "Contactos",
+        "description": "Crea, edita y elimina contactos con nombre y teléfono."
+      },
+      "broadcast": {
+        "title": "Envío masivo",
+        "description": "Selecciona uno o varios contactos y envía el mismo mensaje."
+      },
+      "scheduling": {
+        "title": "Programación",
+        "description": "Una Cloud Function marca el mensaje como enviado a la hora elegida."
+      },
+      "isolation": {
+        "title": "Datos aislados",
+        "description": "Las reglas de Firestore garantizan que cada cliente vea solo sus datos."
+      },
+      "realtime": {
+        "title": "Tiempo real",
+        "description": "Listas actualizadas al instante con los listeners de Firestore."
+      }
+    }
+  },
+  "connections": {
+    "title": "Conexiones",
+    "subtitle": "{count} conexión(es) registrada(s)",
+    "new": "Nueva conexión",
+    "empty": "Todavía no tienes conexiones.",
+    "emptyHint": "Crea la primera conexión para registrar contactos y enviar mensajes.",
+    "nameLabel": "Nombre de la conexión",
+    "createTitle": "Nueva conexión",
+    "editTitle": "Editar conexión",
+    "deleteTitle": "Eliminar conexión",
+    "deleteMessage": "¿Eliminar \"{name}\"? Sus contactos y mensajes también se eliminarán.",
+    "created": "Conexión creada.",
+    "updated": "Conexión actualizada.",
+    "deleted": "Conexión eliminada.",
+    "openContacts": "Contactos",
+    "openBroadcast": "Broadcast",
+    "createdAt": "Creada el {date}",
+    "notFound": "Conexión no encontrada",
+    "notFoundHint": "Puede haber sido eliminada o pertenece a otra cuenta.",
+    "backToList": "Volver a conexiones"
+  },
+  "contacts": {
+    "title": "Contactos",
+    "subtitle": "{count} contacto(s) en esta conexión",
+    "new": "Nuevo contacto",
+    "empty": "No hay contactos en esta conexión.",
+    "emptyHint": "Agrega contactos para poder enviar mensajes.",
+    "nameLabel": "Nombre",
+    "phoneLabel": "Teléfono",
+    "createTitle": "Nuevo contacto",
+    "editTitle": "Editar contacto",
+    "deleteTitle": "Eliminar contacto",
+    "deleteMessage": "¿Eliminar \"{name}\"? También se quitará de los destinatarios de los mensajes.",
+    "created": "Contacto agregado.",
+    "updated": "Contacto actualizado.",
+    "deleted": "Contacto eliminado."
+  },
+  "broadcast": {
+    "title": "Broadcast",
+    "subtitle": "{count} mensaje(s) en esta conexión",
+    "new": "Nuevo mensaje",
+    "empty": "No hay mensajes aquí.",
+    "emptyHint": "Crea un mensaje para enviarlo ahora o programarlo.",
+    "filterLabel": "Filtrar mensajes",
+    "filters": {
+      "all": "Todos",
+      "sent": "Enviados",
+      "scheduled": "Programados"
+    },
+    "status": {
+      "sent": "Enviado",
+      "scheduled": "Programado"
+    },
+    "recipientsLabel": "Contactos",
+    "recipientsPlaceholder": "Buscar contactos",
+    "selectAll": "Seleccionar todos",
+    "clearSelection": "Limpiar selección",
+    "contentLabel": "Mensaje",
+    "contentCounter": "{count}/{max}",
+    "deliveryLabel": "¿Cuándo enviar?",
+    "deliveryNow": "Enviar ahora",
+    "deliverySchedule": "Programar",
+    "scheduleLabel": "Fecha y hora",
+    "sendNow": "Enviar ahora",
+    "schedule": "Programar",
+    "saveChanges": "Guardar cambios",
+    "createTitle": "Nuevo mensaje",
+    "editTitle": "Editar mensaje",
+    "deleteTitle": "Eliminar mensaje",
+    "deleteMessage": "¿Eliminar este mensaje? Esta acción no se puede deshacer.",
+    "sentToast": "Mensaje enviado.",
+    "scheduledToast": "Mensaje programado.",
+    "updated": "Mensaje actualizado.",
+    "deleted": "Mensaje eliminado.",
+    "recipientsCount": "{count} contacto(s)",
+    "scheduledFor": "Programado para {date}",
+    "sentAt": "Enviado el {date}",
+    "noRecipients": "Sin destinatarios",
+    "removedContact": "Contacto eliminado",
+    "noContacts": "Registra contactos en esta conexión antes de enviar mensajes.",
+    "goToContacts": "Ir a contactos",
+    "sentEditHint": "Este mensaje ya fue enviado: solo se pueden editar el texto y los contactos."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Página no encontrada",
+    "description": "La dirección solicitada no existe o fue movida.",
+    "back": "Volver al inicio"
+  },
+  "lang": {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  }
+}

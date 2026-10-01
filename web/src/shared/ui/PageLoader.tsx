@@ -1,9 +1,12 @@
-import { CircularProgress, Box } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useTranslation } from '@/shared/i18n/useTranslation';
 
-interface Props { minHeight?: string }
+export const PageLoader = () => {
+  const { t } = useTranslation();
 
-export const PageLoader = ({ minHeight = '200px' }: Props) => (
-  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight }}>
-    <CircularProgress size={32} />
-  </Box>
-);
+  return (
+    <output className="flex min-h-[40vh] items-center justify-center">
+      <CircularProgress aria-label={t('common.loading')} />
+    </output>
+  );
+};

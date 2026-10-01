@@ -1,132 +1,74 @@
-import { Typography, Button, Box, Chip, Card, CardContent } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import {
-  FiUsers, FiMessageSquare, FiClock, FiShield, FiSmartphone, FiCheckCircle, FiArrowRight, FiZap,
-} from 'react-icons/fi';
-import { BRAND, LAYOUT } from '@/shared/constants/theme';
-import { useLang } from '@/shared/hooks/useLang';
-import type { ReactNode } from 'react';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import BoltOutlined from '@mui/icons-material/BoltOutlined';
+import CampaignOutlined from '@mui/icons-material/CampaignOutlined';
+import HubOutlined from '@mui/icons-material/HubOutlined';
+import PeopleOutlined from '@mui/icons-material/PeopleOutlined';
+import ScheduleOutlined from '@mui/icons-material/ScheduleOutlined';
+import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
+import { Link } from 'react-router';
+import { ROUTES } from '@/shared/config/routes';
+import { useTranslation } from '@/shared/i18n/useTranslation';
 
-interface Feature { title: string; description: string; icon: ReactNode; badge?: string }
-interface Stat    { label: string; value: string }
-
-const FEATURE_ICONS: ReactNode[] = [
-  <FiUsers />, <FiSmartphone />, <FiMessageSquare />, <FiClock />, <FiShield />, <FiCheckCircle />,
-];
-
-const FEATURE_KEYS = ['connections', 'contacts', 'broadcast', 'scheduling', 'security', 'realtime'] as const;
-const STAT_KEYS = ['connections', 'latency', 'isolation', 'uptime'] as const;
-
-const FeatureCard = ({ feature }: { feature: Feature }) => (
-  <Card sx={{ height: '100%', position: 'relative', overflow: 'visible' }}>
-    {feature.badge && (
-      <Chip label={feature.badge} color="primary" size="small" sx={{ position: 'absolute', top: -10, right: 16, fontWeight: 700, fontSize: '0.65rem' }} />
-    )}
-    <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-      <Box sx={{ width: 40, height: 40, borderRadius: `${LAYOUT.borderRadiusSm}px`, background: BRAND.gradient, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18, mb: 1.5 }}>
-        {feature.icon}
-      </Box>
-      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>{feature.title}</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.65, fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
-        {feature.description}
-      </Typography>
-    </CardContent>
-  </Card>
-);
-
-const StatItem = ({ stat, index, total }: { stat: Stat; index: number; total: number }) => (
-  <Box
-    sx={{
-      p: { xs: 2, sm: 3 },
-      textAlign: 'center',
-      borderRight: { md: index < total - 1 ? '1px solid' : 'none' },
-      borderBottom: { xs: index < total - 2 ? '1px solid' : 'none', md: 'none' },
-      borderColor: 'divider',
-    }}
-  >
-    <Typography variant="h6" color="primary.main" sx={{ fontWeight: 800, fontSize: { xs: '1rem', sm: '1.2rem' } }}>
-      {stat.value}
-    </Typography>
-    <Typography variant="caption" color="text.secondary">{stat.label}</Typography>
-  </Box>
-);
+const FEATURES = [
+  { key: 'connections', icon: <HubOutlined /> },
+  { key: 'contacts', icon: <PeopleOutlined /> },
+  { key: 'broadcast', icon: <CampaignOutlined /> },
+  { key: 'scheduling', icon: <ScheduleOutlined /> },
+  { key: 'isolation', icon: <ShieldOutlined /> },
+  { key: 'realtime', icon: <BoltOutlined /> },
+] as const satisfies ReadonlyArray<{ key: string; icon: ReactElement }>;
 
 export const HomePage = () => {
-  const navigate = useNavigate();
-  const { t } = useLang();
-
-  const features: Feature[] = FEATURE_KEYS.map((key, i) => ({
-    title: t.home.features[key].title,
-    description: t.home.features[key].description,
-    icon: FEATURE_ICONS[i],
-    badge: (t.home.features[key] as any).badge,
-  }));
-
-  const stats: Stat[] = STAT_KEYS.map(key => ({
-    label: t.home.stats[key].label,
-    value: t.home.stats[key].value,
-  }));
+  const { t } = useTranslation();
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 4, md: 6 }, py: { xs: 2, md: 4 } }}>
-
-      <Box sx={{ textAlign: 'center', maxWidth: 640, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2.5, px: 1 }}>
-        <Chip label={t.home.badge} variant="outlined" color="primary" sx={{ fontWeight: 700, borderRadius: '999px', fontSize: '0.7rem' }} />
-        <Typography variant="h3" sx={{ fontWeight: 800, fontSize: { xs: '1.6rem', sm: '2rem', md: '2.5rem' }, lineHeight: 1.2 }}>
-          {`${t.home.heroTitle} `}
-          <Box component="span" sx={{ background: BRAND.gradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            {t.home.heroHighlight}
-          </Box>
+    <div className="flex flex-col gap-16 py-4 sm:py-10">
+      <section className="mx-auto flex max-w-2xl flex-col items-center gap-6 text-center">
+        <Chip label={t('home.badge')} color="primary" variant="outlined" />
+        <Typography variant="h3" component="h1" className="text-3xl font-extrabold sm:text-5xl">
+          {`${t('home.title')} `}
+          <span className="brand-gradient-text">{t('home.highlight')}</span>
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 480, lineHeight: 1.7, fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
-          {t.home.heroDescription}
+        <Typography variant="body1" color="text.secondary" className="max-w-xl">
+          {t('home.description')}
         </Typography>
-        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Button variant="contained" size="medium" endIcon={<FiArrowRight />} onClick={() => navigate('/register')} sx={{ borderRadius: '999px', px: 3, fontWeight: 700, fontSize: '0.8rem' }}>
-            {t.home.startFree}
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button component={Link} to={ROUTES.register} variant="contained" size="large" endIcon={<ArrowForward />}>
+            {t('home.ctaPrimary')}
           </Button>
-          <Button variant="outlined" size="medium" onClick={() => navigate('/login')} sx={{ borderRadius: '999px', px: 3, fontWeight: 700, fontSize: '0.8rem' }}>
-            {t.home.doLogin}
+          <Button component={Link} to={ROUTES.login} variant="outlined" size="large">
+            {t('home.ctaSecondary')}
           </Button>
-        </Box>
-      </Box>
+        </div>
+      </section>
 
-      <Card sx={{ overflow: 'hidden' }}>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' } }}>
-          {stats.map((stat, i) => <StatItem key={stat.label} stat={stat} index={i} total={stats.length} />)}
-        </Box>
-      </Card>
-
-      <Box>
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, fontSize: { xs: '1.1rem', sm: '1.3rem' } }}>
-            {t.home.featuresTitle}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-            {t.home.featuresSubtitle}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: { xs: 2, sm: 2.5 } }}>
-          {features.map(f => <FeatureCard key={f.title} feature={f} />)}
-        </Box>
-      </Box>
-
-      <Box sx={{ borderRadius: `${LAYOUT.borderRadius}px`, background: BRAND.gradient, p: { xs: 3, md: 5 }, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-        <Box sx={{ fontSize: 32, color: '#fff' }}><FiZap /></Box>
-        <Typography variant="h5" sx={{ fontWeight: 800, color: '#fff', fontSize: { xs: '1.1rem', sm: '1.4rem' } }}>
-          {t.home.ctaTitle}
+      <section aria-labelledby="features-title" className="flex flex-col gap-6">
+        <Typography id="features-title" variant="h5" component="h2" className="text-center font-bold">
+          {t('home.featuresTitle')}
         </Typography>
-        <Typography variant="body2" sx={{ opacity: 0.85, maxWidth: 420, color: '#fff', fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-          {t.home.ctaDescription}
-        </Typography>
-        <Button
-          variant="contained"
-          onClick={() => navigate('/register')}
-          sx={{ bgcolor: '#fff', color: '#6366f1', fontWeight: 700, borderRadius: '999px', px: 4, '&:hover': { bgcolor: '#f1f5f9' } }}
-        >
-          {t.home.ctaButton}
-        </Button>
-      </Box>
-    </Box>
+        <ul className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map(({ key, icon }) => (
+            <li key={key}>
+              <Card className="flex h-full flex-col gap-2 p-5">
+                <span className="brand-gradient flex size-10 items-center justify-center rounded-lg text-white">
+                  {icon}
+                </span>
+                <Typography variant="subtitle1" component="h3" className="font-bold">
+                  {t(`home.features.${key}.title`)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t(`home.features.${key}.description`)}
+                </Typography>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 };

@@ -1,0 +1,4 @@
+export const EMULATOR_HOST = '127.0.0.1';
+const AUTH_EMULATOR_PORT = 9099;
+export const AUTH_EMULATOR_URL = `http://${EMULATOR_HOST}:${AUTH_EMULATOR_PORT}`;
+export const FIRESTORE_EMULATOR_PORT = 8080;

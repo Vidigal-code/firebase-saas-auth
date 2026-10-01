@@ -1,0 +1,196 @@
+{
+  "common": {
+    "appName": "BroadcastApp",
+    "save": "Salvar",
+    "saving": "Salvando...",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "deleting": "Excluindo...",
+    "edit": "Editar",
+    "back": "Voltar",
+    "loading": "Carregando...",
+    "account": "Conta",
+    "changePassword": "Alterar senha",
+    "logout": "Sair",
+    "login": "Entrar",
+    "register": "Criar conta",
+    "openMenu": "Abrir menu da conta",
+    "lightMode": "Ativar tema claro",
+    "darkMode": "Ativar tema escuro",
+    "language": "Idioma",
+    "loadError": "Não foi possível carregar os dados. Tente novamente.",
+    "saveError": "Não foi possível salvar. Verifique os dados e tente novamente.",
+    "deleteError": "Não foi possível excluir. Tente novamente.",
+    "previousPage": "Página anterior",
+    "pagination": "Paginação",
+    "creator": "Desenvolvido por"
+  },
+  "validation": {
+    "required": "Campo obrigatório.",
+    "maxLength": "Use no máximo {max} caracteres.",
+    "email": "Informe um e-mail válido.",
+    "passwordPolicy": "Mínimo de 8 caracteres, com letra maiúscula, minúscula, número e caractere especial.",
+    "phone": "Informe um telefone válido com DDD (10 a 15 dígitos), ex.: +55 11 99999-8888.",
+    "recipientsRequired": "Selecione ao menos um contato.",
+    "recipientsMax": "Selecione no máximo {max} contatos.",
+    "scheduleRequired": "Informe a data e o horário do envio.",
+    "scheduleInPast": "Escolha uma data e horário no futuro."
+  },
+  "auth": {
+    "loginTitle": "Bem-vindo de volta",
+    "loginSubtitle": "Entre para gerenciar suas conexões e mensagens.",
+    "registerTitle": "Crie sua conta",
+    "registerSubtitle": "Cada conta é um cliente isolado do BroadcastApp.",
+    "email": "E-mail",
+    "password": "Senha",
+    "currentPassword": "Senha atual",
+    "newPassword": "Nova senha",
+    "passwordHint": "8+ caracteres com maiúscula, minúscula, número e símbolo.",
+    "loginButton": "Entrar",
+    "loginPending": "Entrando...",
+    "registerButton": "Criar conta",
+    "registerPending": "Criando conta...",
+    "noAccount": "Ainda não tem conta?",
+    "hasAccount": "Já tem uma conta?",
+    "changePasswordTitle": "Alterar senha",
+    "changePasswordButton": "Atualizar senha",
+    "passwordChanged": "Senha atualizada com sucesso.",
+    "errors": {
+      "invalidCredentials": "E-mail ou senha incorretos.",
+      "emailInUse": "Este e-mail já está cadastrado.",
+      "weakPassword": "A senha é muito fraca.",
+      "tooManyRequests": "Muitas tentativas. Aguarde alguns minutos.",
+      "network": "Falha de conexão. Verifique sua internet.",
+      "unknown": "Não foi possível concluir a operação. Tente novamente."
+    }
+  },
+  "home": {
+    "badge": "Broadcast multi-tenant em tempo real",
+    "title": "Envie mensagens para seus contatos",
+    "highlight": "agora ou no horário certo",
+    "description": "Organize contatos por conexão, dispare mensagens imediatamente ou agende para o futuro. O envio agendado acontece no servidor, mesmo com o app fechado.",
+    "ctaPrimary": "Começar grátis",
+    "ctaSecondary": "Já tenho conta",
+    "featuresTitle": "Tudo o que o seu broadcast precisa",
+    "features": {
+      "connections": {
+        "title": "Conexões",
+        "description": "Agrupe seus contatos e mensagens em conexões independentes."
+      },
+      "contacts": {
+        "title": "Contatos",
+        "description": "Cadastre, edite e remova contatos com nome e telefone."
+      },
+      "broadcast": {
+        "title": "Envio em massa",
+        "description": "Selecione um ou vários contatos e envie a mesma mensagem."
+      },
+      "scheduling": {
+        "title": "Agendamento",
+        "description": "Uma Cloud Function marca a mensagem como enviada no horário definido."
+      },
+      "isolation": {
+        "title": "Dados isolados",
+        "description": "Regras do Firestore garantem que cada cliente vê apenas os próprios dados."
+      },
+      "realtime": {
+        "title": "Tempo real",
+        "description": "Listas atualizadas instantaneamente com os listeners do Firestore."
+      }
+    }
+  },
+  "connections": {
+    "title": "Conexões",
+    "subtitle": "{count} conexão(ões) cadastrada(s)",
+    "new": "Nova conexão",
+    "empty": "Você ainda não tem conexões.",
+    "emptyHint": "Crie a primeira conexão para cadastrar contatos e enviar mensagens.",
+    "nameLabel": "Nome da conexão",
+    "createTitle": "Nova conexão",
+    "editTitle": "Editar conexão",
+    "deleteTitle": "Excluir conexão",
+    "deleteMessage": "Excluir \"{name}\"? Os contatos e mensagens desta conexão também serão removidos.",
+    "created": "Conexão criada.",
+    "updated": "Conexão atualizada.",
+    "deleted": "Conexão excluída.",
+    "openContacts": "Contatos",
+    "openBroadcast": "Broadcast",
+    "createdAt": "Criada em {date}",
+    "notFound": "Conexão não encontrada",
+    "notFoundHint": "Ela pode ter sido excluída ou pertence a outra conta.",
+    "backToList": "Voltar para conexões"
+  },
+  "contacts": {
+    "title": "Contatos",
+    "subtitle": "{count} contato(s) nesta conexão",
+    "new": "Novo contato",
+    "empty": "Nenhum contato nesta conexão.",
+    "emptyHint": "Adicione contatos para poder enviar mensagens.",
+    "nameLabel": "Nome",
+    "phoneLabel": "Telefone",
+    "createTitle": "Novo contato",
+    "editTitle": "Editar contato",
+    "deleteTitle": "Excluir contato",
+    "deleteMessage": "Excluir \"{name}\"? Ele também será removido dos destinatários das mensagens.",
+    "created": "Contato adicionado.",
+    "updated": "Contato atualizado.",
+    "deleted": "Contato excluído."
+  },
+  "broadcast": {
+    "title": "Broadcast",
+    "subtitle": "{count} mensagem(ns) nesta conexão",
+    "new": "Nova mensagem",
+    "empty": "Nenhuma mensagem por aqui.",
+    "emptyHint": "Crie uma mensagem para enviar agora ou agendar.",
+    "filterLabel": "Filtrar mensagens",
+    "filters": {
+      "all": "Todas",
+      "sent": "Enviadas",
+      "scheduled": "Agendadas"
+    },
+    "status": {
+      "sent": "Enviada",
+      "scheduled": "Agendada"
+    },
+    "recipientsLabel": "Contatos",
+    "recipientsPlaceholder": "Buscar contatos",
+    "selectAll": "Selecionar todos",
+    "clearSelection": "Limpar seleção",
+    "contentLabel": "Mensagem",
+    "contentCounter": "{count}/{max}",
+    "deliveryLabel": "Quando enviar?",
+    "deliveryNow": "Enviar agora",
+    "deliverySchedule": "Agendar",
+    "scheduleLabel": "Data e horário",
+    "sendNow": "Enviar agora",
+    "schedule": "Agendar",
+    "saveChanges": "Salvar alterações",
+    "createTitle": "Nova mensagem",
+    "editTitle": "Editar mensagem",
+    "deleteTitle": "Excluir mensagem",
+    "deleteMessage": "Excluir esta mensagem? Esta ação não pode ser desfeita.",
+    "sentToast": "Mensagem enviada.",
+    "scheduledToast": "Mensagem agendada.",
+    "updated": "Mensagem atualizada.",
+    "deleted": "Mensagem excluída.",
+    "recipientsCount": "{count} contato(s)",
+    "scheduledFor": "Agendada para {date}",
+    "sentAt": "Enviada em {date}",
+    "noRecipients": "Sem destinatários",
+    "removedContact": "Contato removido",
+    "noContacts": "Cadastre contatos nesta conexão antes de enviar mensagens.",
+    "goToContacts": "Ir para contatos",
+    "sentEditHint": "Esta mensagem já foi enviada: apenas o texto e os contatos podem ser editados."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Página não encontrada",
+    "description": "O endereço acessado não existe ou foi movido.",
+    "back": "Voltar ao início"
+  },
+  "lang": {
+    "pt": "Português",
+    "en": "English",
+    "es": "Español"
+  }
+}

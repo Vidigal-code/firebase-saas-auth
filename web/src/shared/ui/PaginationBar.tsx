@@ -1,32 +1,28 @@
-import { Box, Pagination } from '@mui/material';
+import Pagination from '@mui/material/Pagination';
+import { useTranslation } from '@/shared/i18n/useTranslation';
 
-interface Props {
+const SINGLE_PAGE = 1;
+
+export interface PaginationBarProps {
   page: number;
   pageCount: number;
-  visible: boolean;
-  onChange: (event: unknown, value: number) => void;
+  onChange: (page: number) => void;
 }
 
-export const PaginationBar = ({ page, pageCount, visible, onChange }: Props) => {
-  if (!visible) return null;
+export const PaginationBar = ({ page, pageCount, onChange }: Readonly<PaginationBarProps>) => {
+  const { t } = useTranslation();
+
+  if (pageCount <= SINGLE_PAGE) return null;
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3, px: 1 }}>
+    <nav aria-label={t('common.pagination')} className="mt-6 flex justify-center">
       <Pagination
         count={pageCount}
         page={page}
-        onChange={onChange}
+        onChange={(_, next) => onChange(next)}
         color="primary"
         shape="rounded"
-        size="small"
-        showFirstButton
-        showLastButton
-        sx={{
-          '& .MuiPagination-ul': {
-            flexWrap: 'nowrap',
-          },
-        }}
       />
-    </Box>
+    </nav>
   );
 };

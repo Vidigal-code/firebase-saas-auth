@@ -1,0 +1,42 @@
+@layer theme, base, mui, components, utilities;
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--mui-font-family, 'Inter', system-ui, sans-serif);
+
+  --breakpoint-sm: 37.5rem;
+  --breakpoint-md: 56.25rem;
+  --breakpoint-lg: 75rem;
+  --breakpoint-xl: 96rem;
+
+  --color-primary: var(--mui-palette-primary-main);
+  --color-primary-contrast: var(--mui-palette-primary-contrastText);
+  --color-secondary: var(--mui-palette-secondary-main);
+  --color-success: var(--mui-palette-success-main);
+  --color-warning: var(--mui-palette-warning-main);
+  --color-error: var(--mui-palette-error-main);
+
+  --color-text-primary: var(--mui-palette-text-primary);
+  --color-text-secondary: var(--mui-palette-text-secondary);
+  --color-divider: var(--mui-palette-divider);
+
+  --color-background-default: var(--mui-palette-background-default);
+  --color-background-paper: var(--mui-palette-background-paper);
+
+  --color-action-hover: var(--mui-palette-action-hover);
+  --color-action-selected: var(--mui-palette-action-selected);
+}
+
+@layer components {
+  .brand-gradient,
+  .brand-gradient-text {
+    background-image: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  }
+
+  .brand-gradient-text {
+    background-clip: text;
+    color: transparent;
+  }
+}

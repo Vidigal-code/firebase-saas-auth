@@ -1,14 +1,15 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './App.tsx';
-import './index.css';
+import { App } from './app/App';
+import './app/styles/global.css';
 
-import { AppProviders } from './app/providers';
+const ROOT_ELEMENT_ID = 'root';
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById(ROOT_ELEMENT_ID);
+if (!rootElement) throw new Error(`Missing #${ROOT_ELEMENT_ID} element in index.html.`);
+
+createRoot(rootElement).render(
   <StrictMode>
-    <AppProviders>
-      <App />
-    </AppProviders>
-  </StrictMode>
+    <App />
+  </StrictMode>,
 );

@@ -1,222 +1,42 @@
-# 🌐 BroadcastApp — Web Frontend
+# 🖥️ BroadcastApp: Web
 
-[![React](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite_8-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev/)
-[![MUI](https://img.shields.io/badge/MUI_9-007FFF?style=flat-square&logo=mui&logoColor=white)](https://mui.com/)
+[![React 19](https://img.shields.io/badge/React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![MUI 9](https://img.shields.io/badge/MUI_9-007FFF?style=flat-square&logo=mui&logoColor=white)](https://mui.com/)
+[![Tailwind 4](https://img.shields.io/badge/Tailwind_4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Vite 8](https://img.shields.io/badge/Vite_8-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev/)
 
----
+Frontend do BroadcastApp em Feature-Sliced Design, paradigma funcional e tempo real com Firestore.
 
-## 🇧🇷 Descrição em Português
-
-<details>
-<summary><strong>Ver Detalhes</strong></summary>
-
-### Visão Geral
-
-Frontend SPA (Single Page Application) do BroadcastApp, construído com **React 19**, **TypeScript**, **Vite 8** e **Material UI 9**. Segue a arquitetura **Feature-Sliced Design (FSD)** com princípios SOLID e Clean Code.
-
-### Estrutura de Pastas
+## Estrutura
 
 ```
-web/src/
-├── app/                          # Camada de aplicação
-│   ├── providers/index.tsx       # ThemeProvider, LangProvider, Redux, React Query
-│   ├── router/index.tsx          # Rotas públicas e privadas
-│   └── store/index.ts            # Redux Store
-│
-├── pages/                        # Composição de páginas
-│   ├── auth/
-│   │   ├── LoginPage.tsx         # Login com Firebase Auth
-│   │   └── RegisterPage.tsx      # Cadastro com validação Yup
-│   ├── home/HomePage.tsx         # Landing page pública
-│   ├── connections/              # CRUD de conexões (paginado)
-│   ├── contacts/                 # CRUD de contatos (paginado)
-│   └── messages/                 # CRUD de mensagens (paginado + filtro)
-│
-├── features/                     # Lógica de negócio
-│   ├── auth/ui/                  # Dialog de troca de senha
-│   └── connection/
-│       ├── hooks/                # useConnectionCrud (mutations + estado)
-│       └── ui/                   # ConnectionDialog
-│
-├── entities/                     # Entidades de domínio
-│   ├── connection/
-│   │   ├── api/index.ts          # CRUD Firestore (create, update, delete)
-│   │   ├── model/hooks.ts        # useConnections (realtime listener)
-│   │   └── ui/ConnectionCard.tsx # Card visual da conexão
-│   ├── contact/                  # Mesma estrutura (api, model)
-│   └── message/                  # Mesma estrutura (api, model)
-│
-├── shared/                       # Reutilizáveis globais
-│   ├── config/
-│   │   ├── env.ts                # Variáveis de ambiente tipadas
-│   │   ├── firebase.ts           # Inicialização Firebase SDK
-│   │   └── i18n.ts               # Configuração de idiomas (pt, en, es)
-│   ├── constants/theme.ts        # Paletas dark/light, layout, brand
-│   ├── langs/                    # Arquivos de tradução
-│   │   ├── pt.json               # Português
-│   │   ├── en.json               # English
-│   │   └── es.json               # Español
-│   ├── providers/
-│   │   └── LangProvider.tsx      # Context Provider de idioma
-│   ├── hooks/
-│   │   ├── useConfirmDialog.ts   # Estado do dialog de confirmação
-│   │   ├── useCurrentUser.ts     # Auth state do Firebase
-│   │   ├── useFirestoreCollection.ts # Listener genérico Firestore
-│   │   ├── useLang.ts            # Hook para acessar traduções
-│   │   └── usePagination.ts      # Paginação genérica reutilizável
-│   ├── lib/firestore.ts          # CRUD helpers (addDocument, updateDocument...)
-│   └── ui/
-│       ├── ActionButtonGroup.tsx  # Grid de botões proporcionais
-│       ├── ConfirmDialog.tsx      # Dialog de exclusão reutilizável
-│       ├── EmptyState.tsx         # Estado vazio padrão
-│       ├── LangSelector.tsx       # Seletor de idioma (pt/en/es)
-│       ├── PageHeader.tsx         # Header de página responsivo
-│       ├── PageLoader.tsx         # Spinner de carregamento
-│       ├── PaginationBar.tsx      # Barra de paginação
-│       └── StatusChip.tsx         # Chip de status (enviada/agendada)
-│
-└── widgets/                      # Layouts compostos
-    └── layouts/
-        ├── DashboardLayout.tsx   # Layout autenticado (sidebar + header)
-        ├── PublicLayout.tsx      # Layout público (header + footer)
-        └── ui/
-            ├── AppHeader.tsx     # Header com avatar, tema, idioma, menu
-            ├── AppSidebar.tsx    # Sidebar com navegação
-            ├── Footer.tsx        # Rodapé com créditos
-            └── MobileDrawer.tsx  # Drawer mobile
+src/
+├── app/        # AppProviders (tema, i18n, notificações, sessão), router, estilos globais
+├── pages/      # home, auth, connections, contacts, broadcast, not-found
+├── widgets/    # app-shell (TopBar, AccountMenu, layouts) e connection-shell (abas da conexão)
+├── features/   # auth, connection-editor, contact-editor, message-composer, message-filter
+├── entities/   # session, connection, contact, message (modelo, repositório, hooks, UI)
+├── shared/     # firebase, i18n, theme, domain, hooks, lib, ui
+└── test/       # utilitários de teste e testes de integração
 ```
 
-### Configuração de Ambiente (`envexample.txt`)
+## Decisões
 
-Copie `envexample.txt` para `.env` e preencha com as credenciais do seu projeto Firebase:
+- **MUI + Tailwind**: componentes do MUI e estilização com classes Tailwind, seguindo o guia oficial (CSS layers `theme, base, mui, components, utilities` e `StyledEngineProvider enableCssLayer`). As cores existem só no tema do MUI (`cssVariables`) e são mapeadas para o Tailwind em `app/styles/global.css`.
+- **Tempo real**: `useRealtimeQuery`/`useRealtimeDocument` (sobre `useSubscription`) assinam `onSnapshot` e descartam dados de consultas antigas.
+- **Repositórios**: cada entidade concentra consultas tipadas (conversores somente leitura) e escritas com payloads explícitos e `serverTimestamp()`.
+- **Formulários**: React Hook Form + Zod; as mensagens de validação são chaves de tradução.
+- **i18n tipado**: `t('broadcast.filters.sent')` só aceita chaves que existem em `locales/pt.json`.
 
-```env
-VITE_FIREBASE_API_KEY=""              # API Key do Firebase (Console > Configurações do projeto)
-VITE_FIREBASE_AUTH_DOMAIN=""          # Auth domain (ex: meu-projeto.firebaseapp.com)
-VITE_FIREBASE_PROJECT_ID=""           # ID do projeto Firebase
-VITE_FIREBASE_STORAGE_BUCKET=""       # Bucket de storage (ex: meu-projeto.appspot.com)
-VITE_FIREBASE_MESSAGING_SENDER_ID="" # Sender ID do Cloud Messaging
-VITE_FIREBASE_APP_ID=""               # App ID do Firebase
-VITE_FIREBASE_MEASUREMENT_ID=""       # ID do Google Analytics (opcional)
-VITE_START_THEME="dark"               # Tema inicial: "dark" ou "light"
-VITE_START_LANG="pt"                  # Idioma inicial: "pt", "en" ou "es"
-```
+## Scripts
 
-**Onde encontrar:** Firebase Console → ⚙️ Configurações do projeto → Seus apps → SDK Web → `firebaseConfig`
+| Script | Descrição |
+|---|---|
+| `npm run dev` | Vite usando o projeto do `.env` |
+| `npm run dev:emulators` | Vite conectado aos emuladores locais |
+| `npm run build` | typecheck + build de produção |
+| `npm run lint` / `npm run typecheck` | ESLint e TypeScript |
+| `npm test` / `npm run test:coverage` | testes unitários e de componentes (jsdom) |
+| `npm run test:integration` | repositórios e auth reais contra os emuladores de Auth e Firestore |
 
-**Importante:** O arquivo `.env` está no `.gitignore` e nunca deve ser commitado.
-
-### Internacionalização (i18n)
-
-O sistema de idiomas é baseado em arquivos JSON estáticos com um `LangProvider` React Context:
-
-- **Prioridade:** URL (`?lang=pt`) > localStorage > `.env` (`VITE_START_LANG`) > fallback (`pt`)
-- **Persistência:** `localStorage` com chave `broadcastapp:lang`
-- **Seletor:** Componente `LangSelector` no header de todas as páginas
-- **URL:** Suporta `?lang=pt&theme=dark` para links diretos
-
-Cada JSON contém todas as strings da aplicação organizadas por domínio (auth, connections, contacts, messages, home, common, lang).
-
-### Comandos
-
-```bash
-npm install     # Instalar dependências
-npm run dev     # Servidor de desenvolvimento (http://localhost:5173)
-npm run build   # Build de produção (gera web/dist/)
-npm run lint    # Verificação ESLint
-npm run preview # Preview do build de produção
-```
-
-### Tema Dark/Light
-
-O sistema de temas usa MUI `createTheme` com duas paletas completas (`DARK_PALETTE` e `LIGHT_PALETTE`). Todos os componentes MUI possuem overrides para garantir contraste correto em ambos os modos. A preferência é persistida em `localStorage` com a chave `broadcastapp:theme`. Também pode ser definido via URL: `?theme=dark`.
-
-### Responsividade
-
-Todos os componentes são 100% responsivos usando breakpoints MUI (`xs`, `sm`, `md`, `lg`, `xl`):
-
-- **Mobile (xs)**: Grid 1 coluna, botões empilhados, header empilhado, sidebar em drawer
-- **Tablet (sm)**: Grid 2 colunas, botões lado a lado
-- **Desktop (lg+)**: Grid 3 colunas, sidebar fixa visível
-
-</details>
-
----
-
-## 🇺🇸 English Description
-
-<details>
-<summary><strong>View Details</strong></summary>
-
-### Overview
-
-BroadcastApp's SPA (Single Page Application) frontend, built with **React 19**, **TypeScript**, **Vite 8**, and **Material UI 9**. Follows **Feature-Sliced Design (FSD)** architecture with SOLID and Clean Code principles.
-
-### Folder Structure
-
-```
-web/src/
-├── app/           # Application layer (Providers, Router, Store)
-├── pages/         # Page composition (auth, connections, contacts, messages)
-├── features/      # Business logic (CRUD hooks, feature-specific dialogs)
-├── entities/      # Domain entities (api, model hooks, UI components)
-├── shared/        # Global reusables (config, hooks, langs, lib, ui components)
-└── widgets/       # Composite layouts (Dashboard, Public, Header, Sidebar)
-```
-
-### Environment Configuration (`envexample.txt`)
-
-Copy `envexample.txt` to `.env` and fill with your Firebase project credentials:
-
-```env
-VITE_FIREBASE_API_KEY=""              # Firebase API Key (Console > Project settings)
-VITE_FIREBASE_AUTH_DOMAIN=""          # Auth domain (e.g., my-project.firebaseapp.com)
-VITE_FIREBASE_PROJECT_ID=""           # Firebase project ID
-VITE_FIREBASE_STORAGE_BUCKET=""       # Storage bucket (e.g., my-project.appspot.com)
-VITE_FIREBASE_MESSAGING_SENDER_ID="" # Cloud Messaging sender ID
-VITE_FIREBASE_APP_ID=""               # Firebase App ID
-VITE_FIREBASE_MEASUREMENT_ID=""       # Google Analytics ID (optional)
-VITE_START_THEME="dark"               # Initial theme: "dark" or "light"
-VITE_START_LANG="pt"                  # Initial language: "pt", "en" or "es"
-```
-
-**Where to find:** Firebase Console → ⚙️ Project settings → Your apps → Web SDK → `firebaseConfig`
-
-**Important:** The `.env` file is in `.gitignore` and must never be committed.
-
-### Internationalization (i18n)
-
-The language system is based on static JSON files with a `LangProvider` React Context:
-
-- **Priority:** URL (`?lang=pt`) > localStorage > `.env` (`VITE_START_LANG`) > fallback (`pt`)
-- **Persistence:** `localStorage` under `broadcastapp:lang`
-- **Selector:** `LangSelector` component in the header of all pages
-- **URL:** Supports `?lang=pt&theme=dark` for direct links
-
-Each JSON contains all application strings organized by domain (auth, connections, contacts, messages, home, common, lang).
-
-### Commands
-
-```bash
-npm install     # Install dependencies
-npm run dev     # Development server (http://localhost:5173)
-npm run build   # Production build (outputs to web/dist/)
-npm run lint    # ESLint check
-npm run preview # Preview production build
-```
-
-### Dark/Light Theme
-
-The theme system uses MUI `createTheme` with two complete palettes (`DARK_PALETTE` and `LIGHT_PALETTE`). All MUI components have style overrides ensuring proper contrast in both modes. Preference is persisted in `localStorage` under the key `broadcastapp:theme`. Can also be set via URL: `?theme=dark`.
-
-### Responsiveness
-
-All components are 100% responsive using MUI breakpoints (`xs`, `sm`, `md`, `lg`, `xl`):
-
-- **Mobile (xs)**: 1-column grid, stacked buttons, stacked header, drawer sidebar
-- **Tablet (sm)**: 2-column grid, inline buttons
-- **Desktop (lg+)**: 3-column grid, fixed visible sidebar
-
-</details>
+Variáveis de ambiente: veja `.env.example`.
