@@ -6,3 +6,9 @@ functions/node_modules/
 .idea/
 dist/
 frontend/dist/
+
+# Tooling output
+*.log
+coverage/
+coverage-integration/
+.scannerwork/

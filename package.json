@@ -1,0 +1,23 @@
+{
+  "name": "firebase-saas-auth",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:all": "npm install && npm --prefix functions install && npm --prefix web install",
+    "test": "npm run test:rules && npm --prefix functions test && npm --prefix web test && npm --prefix web run test:integration",
+    "test:rules": "node scripts/with-emulators.mjs firestore \"vitest run --config tests/vitest.config.ts\"",
+    "lint": "npm --prefix functions run lint && npm --prefix web run lint",
+    "typecheck": "tsc -p tests/tsconfig.json && npm --prefix functions run typecheck && npm --prefix web run typecheck",
+    "build": "npm --prefix functions run build && npm --prefix web run build",
+    "emulators": "firebase emulators:start --project demo-broadcast",
+    "deploy": "firebase deploy --only firestore,functions,hosting"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@types/node": "^22.20.4",
+    "firebase": "^12.19.0",
+    "firebase-tools": "^15.32.1",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.3"
+  }
+}
