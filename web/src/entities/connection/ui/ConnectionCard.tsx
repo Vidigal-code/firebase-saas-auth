@@ -16,16 +16,41 @@ export interface ConnectionCardProps {
   onDelete: (connection: Connection) => void;
 }
 
+const ConnectionShortcuts = ({ connectionId }: Readonly<{ connectionId: string }>) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="mt-auto grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <Button
+        component={Link}
+        to={buildContactsPath(connectionId)}
+        variant="outlined"
+        startIcon={<PeopleOutlined />}
+      >
+        {t('connections.openContacts')}
+      </Button>
+      <Button
+        component={Link}
+        to={buildBroadcastPath(connectionId)}
+        variant="contained"
+        startIcon={<CampaignOutlined />}
+      >
+        {t('connections.openBroadcast')}
+      </Button>
+    </div>
+  );
+};
+
 export const ConnectionCard = ({ connection, onEdit, onDelete }: Readonly<ConnectionCardProps>) => {
   const { t, formatDateTime } = useTranslation();
 
   return (
     <Card component="article" className="flex h-full flex-col gap-4 p-4">
-      <div className="flex items-start gap-3">
+      <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:items-start sm:text-left">
         <span className="brand-gradient flex size-10 shrink-0 items-center justify-center rounded-lg text-white">
           <HubOutlined />
         </span>
-        <div className="min-w-0 flex-1">
+        <div className="w-full min-w-0 flex-1">
           <Typography variant="subtitle1" component="h2" className="truncate font-bold" title={connection.name}>
             {connection.name}
           </Typography>
@@ -39,24 +64,7 @@ export const ConnectionCard = ({ connection, onEdit, onDelete }: Readonly<Connec
           onDelete={() => onDelete(connection)}
         />
       </div>
-      <div className="mt-auto grid grid-cols-2 gap-2">
-        <Button
-          component={Link}
-          to={buildContactsPath(connection.id)}
-          variant="outlined"
-          startIcon={<PeopleOutlined />}
-        >
-          {t('connections.openContacts')}
-        </Button>
-        <Button
-          component={Link}
-          to={buildBroadcastPath(connection.id)}
-          variant="contained"
-          startIcon={<CampaignOutlined />}
-        >
-          {t('connections.openBroadcast')}
-        </Button>
-      </div>
+      <ConnectionShortcuts connectionId={connection.id} />
     </Card>
   );
 };

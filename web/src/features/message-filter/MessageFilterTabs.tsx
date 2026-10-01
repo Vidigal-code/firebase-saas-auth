@@ -1,5 +1,7 @@
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import { MESSAGE_FILTERS, type MessageFilter } from '@/entities/message/model/filters';
 import { useTranslation } from '@/shared/i18n/useTranslation';
 import type { TranslationKey } from '@/shared/i18n/translate';
@@ -18,13 +20,15 @@ export interface MessageFilterTabsProps {
 
 export const MessageFilterTabs = ({ value, counts, onChange }: Readonly<MessageFilterTabsProps>) => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isCompact = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Tabs
       value={value}
       onChange={(_, next: MessageFilter) => onChange(next)}
       aria-label={t('broadcast.filterLabel')}
-      variant="scrollable"
+      variant={isCompact ? 'fullWidth' : 'scrollable'}
       allowScrollButtonsMobile
       className="mb-4 border-b border-divider"
     >

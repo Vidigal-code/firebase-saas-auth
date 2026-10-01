@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
@@ -18,6 +18,8 @@ vi.mock('@/features/auth/model/authService', () => ({
 
 const PASSWORD = 'Str0ng!Pass';
 const FEATURE_COUNT = 6;
+const LOGIN_LABEL = 'Entrar';
+const REGISTER_LABEL = 'Criar conta';
 
 const submitCredentials = async (email: string, submitLabel: string) => {
   await userEvent.type(screen.getByLabelText('E-mail'), email);
@@ -51,7 +53,7 @@ describe('public pages', () => {
     renderPublic(ROUTES.login);
 
     const email = 'ana@example.com';
-    await submitCredentials(email, 'Entrar');
+    await submitCredentials(email, LOGIN_LABEL);
 
     await waitFor(() => expect(signIn).toHaveBeenCalledWith({ email, password: PASSWORD }));
   });
@@ -60,7 +62,7 @@ describe('public pages', () => {
     renderPublic(ROUTES.register);
 
     const email = 'novo@example.com';
-    await submitCredentials(email, 'Criar conta');
+    await submitCredentials(email, REGISTER_LABEL);
 
     await waitFor(() => expect(register).toHaveBeenCalledWith({ email, password: PASSWORD }));
   });
@@ -69,5 +71,16 @@ describe('public pages', () => {
     renderPublic('/nao-existe');
 
     expect(screen.getByRole('heading', { name: 'Página não encontrada' })).toBeInTheDocument();
+  });
+
+  it('lists sign in and registration in the mobile navigation menu', async () => {
+    renderPublic(ROUTES.home);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Abrir menu de navegação' }));
+    const drawer = within(screen.getByRole('dialog', { name: 'Menu' }));
+
+    expect(drawer.getByRole('link', { name: LOGIN_LABEL })).toHaveAttribute('href', ROUTES.login);
+    expect(drawer.getByRole('link', { name: REGISTER_LABEL })).toHaveAttribute('href', ROUTES.register);
+    expect(drawer.getByRole('button', { name: /tema/ })).toBeInTheDocument();
   });
 });

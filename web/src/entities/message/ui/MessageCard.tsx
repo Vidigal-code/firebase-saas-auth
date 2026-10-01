@@ -48,8 +48,8 @@ const RecipientChips = ({ contactIds, contactNames }: Readonly<RecipientChipsPro
 
 export const MessageCard = ({ message, contactNames, onEdit, onDelete }: Readonly<MessageCardProps>) => (
   <Card component="article" className="flex h-full flex-col gap-3 p-4">
-    <div className="flex items-start justify-between gap-2">
-      <div className="flex flex-col gap-1">
+    <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col items-center gap-1 sm:items-start">
         <MessageStatusChip status={message.status} />
         <Typography variant="caption" color="text.secondary">
           <DeliveryInfo message={message} />
@@ -61,10 +61,10 @@ export const MessageCard = ({ message, contactNames, onEdit, onDelete }: Readonl
         onDelete={() => onDelete(message)}
       />
     </div>
-    <Typography variant="body2" className="line-clamp-4 whitespace-pre-line break-words">
+    <Typography variant="body2" className="line-clamp-4 whitespace-pre-line break-words text-center sm:text-left">
       {message.content}
     </Typography>
-    <div className="mt-auto flex flex-wrap gap-1">
+    <div className="mt-auto flex flex-wrap justify-center gap-1 sm:justify-start">
       <RecipientChips contactIds={message.contactIds} contactNames={contactNames} />
     </div>
   </Card>

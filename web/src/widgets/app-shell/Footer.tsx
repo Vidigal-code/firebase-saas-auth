@@ -8,7 +8,7 @@ export const Footer = () => {
 
   return (
     <footer className="border-t border-divider bg-background-paper px-4 py-3">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-2 sm:justify-between">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-1 text-center sm:flex-row sm:justify-between">
         <Typography variant="caption" color="text.secondary">
           {`${t('common.creator')} `}
           <a

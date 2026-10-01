@@ -12,12 +12,30 @@ export interface RecipientsFieldProps {
   onChange: (contactIds: string[]) => void;
 }
 
+interface ContactOptionLabelProps {
+  contact: Contact;
+  isSelected: boolean;
+}
+
+const toContactIds = (contacts: readonly Contact[]) => contacts.map((contact) => contact.id);
+
+const ContactOptionLabel = ({ contact, isSelected }: Readonly<ContactOptionLabelProps>) => (
+  <>
+    <Checkbox size="small" checked={isSelected} className="mr-2" />
+    <span className="flex flex-col">
+      <span>{contact.name}</span>
+      <span className="text-xs text-text-secondary">{contact.phone}</span>
+    </span>
+  </>
+);
+
 export const RecipientsField = ({ contacts, value, errorText, onChange }: Readonly<RecipientsFieldProps>) => {
   const { t } = useTranslation();
   const selected = contacts.filter((contact) => value.includes(contact.id));
-  const allSelected = contacts.length > 0 && selected.length === contacts.length;
+  const hasContacts = contacts.length > 0;
+  const allSelected = hasContacts && selected.length === contacts.length;
 
-  const toggleAll = () => onChange(allSelected ? [] : contacts.map((contact) => contact.id));
+  const toggleAll = () => onChange(allSelected ? [] : toContactIds(contacts));
 
   return (
     <div className="flex flex-col gap-1">
@@ -26,16 +44,12 @@ export const RecipientsField = ({ contacts, value, errorText, onChange }: Readon
         disableCloseOnSelect
         options={contacts}
         value={selected}
-        onChange={(_, next) => onChange(next.map((contact) => contact.id))}
+        onChange={(_, next) => onChange(toContactIds(next))}
         getOptionLabel={(contact) => contact.name}
         isOptionEqualToValue={(option, current) => option.id === current.id}
         renderOption={({ key, ...optionProps }, contact, { selected: isSelected }) => (
           <li key={key} {...optionProps}>
-            <Checkbox size="small" checked={isSelected} className="mr-2" />
-            <span className="flex flex-col">
-              <span>{contact.name}</span>
-              <span className="text-xs text-text-secondary">{contact.phone}</span>
-            </span>
+            <ContactOptionLabel contact={contact} isSelected={isSelected} />
           </li>
         )}
         renderInput={(params) => (
@@ -48,7 +62,7 @@ export const RecipientsField = ({ contacts, value, errorText, onChange }: Readon
           />
         )}
       />
-      <Button size="small" onClick={toggleAll} disabled={contacts.length === 0} className="self-start">
+      <Button size="small" onClick={toggleAll} disabled={!hasContacts} className="self-center sm:self-start">
         {allSelected ? t('broadcast.clearSelection') : t('broadcast.selectAll')}
       </Button>
     </div>
