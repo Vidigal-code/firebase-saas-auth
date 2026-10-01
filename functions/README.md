@@ -1,151 +1,39 @@
-# ⚡ BroadcastApp — Cloud Functions
+# ⚡ BroadcastApp: Cloud Functions
 
-[![Firebase](https://img.shields.io/badge/Cloud_Functions_v2-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/docs/functions)
-[![Node](https://img.shields.io/badge/Node_18-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Cloud Functions v2](https://img.shields.io/badge/Cloud_Functions_v2-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/docs/functions)
+[![Node 22](https://img.shields.io/badge/Node_22-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 
----
+Backend do BroadcastApp: agendamento de mensagens e limpeza em cascata. Código funcional, sem classes, com Firebase Admin SDK 14 e firebase-functions 7.
 
-## 🇧🇷 Descrição em Português
+## Funções
 
-<details>
-<summary><strong>Ver Detalhes</strong></summary>
-
-### Visão Geral
-
-Cloud Functions do BroadcastApp, responsáveis pelo processamento automático de mensagens agendadas. Utiliza **Firebase Functions v2** com **Node 18** e **TypeScript**.
-
-### Função: `processScheduledMessages`
-
-```
-Trigger: Cloud Scheduler (a cada 1 minuto)
-Ação:    Busca mensagens com status "scheduled" e scheduledFor <= agora
-         Atualiza em batch para status "sent" com timestamp sentAt
-```
-
-**Fluxo:**
-
-1. O scheduler dispara a cada 1 minuto
-2. Consulta Firestore: `messages` onde `status == 'scheduled'` E `scheduledFor <= now`
-3. Se não houver mensagens, encerra sem ação
-4. Executa `batch.update()` marcando cada mensagem como `sent`
-5. Log de sucesso com quantidade processada
-
-### Estrutura
-
-```
-functions/
-├── src/
-│   └── index.ts          # Função processScheduledMessages
-├── lib/                  # Build compilado (gerado por tsc)
-├── package.json          # Dependências (firebase-admin, firebase-functions)
-└── tsconfig.json         # Configuração TypeScript
-```
-
-### Dependências
-
-| Pacote | Versão | Propósito |
+| Função | Gatilho | O que faz |
 |---|---|---|
-| `firebase-admin` | ^12.1.0 | Acesso administrativo ao Firestore |
-| `firebase-functions` | ^5.0.1 | SDK Cloud Functions v2 |
+| `dispatchScheduledMessages` | agenda `every 1 minutes` | Busca `messages` com `status == 'scheduled'` e `scheduledAt <= agora` (paginado) e grava `status: 'sent'` e `sentAt`. Usa pré-condição `lastUpdateTime`, então uma edição concorrente do cliente nunca é sobrescrita. |
+| `cleanupDeletedConnection` | `connections/{connectionId}` excluído | Remove os `contacts` e `messages` da conexão, sempre filtrando pelo `clientId` do dono. |
+| `detachDeletedContact` | `contacts/{contactId}` excluído | Remove o contato de `contactIds` nas mensagens do mesmo cliente. |
 
-### Comandos
-
-```bash
-npm install          # Instalar dependências
-npm run build        # Compilar TypeScript
-npm run serve        # Emular localmente
-npm run deploy       # Deploy para o Firebase
-npm run logs         # Ver logs de execução
-```
-
-### Pré-requisitos
-
-- Projeto Firebase no **plano Blaze** (pay-as-you-go) — obrigatório para Cloud Functions
-- Firebase CLI instalado (`npm i -g firebase-tools`)
-- Autenticado via `firebase login`
-
-### Deploy
-
-```bash
-# Deploy apenas das functions
-npx firebase-tools deploy --only functions
-
-# Deploy completo (firestore + hosting + functions)
-npx firebase-tools deploy
-```
-
-</details>
-
----
-
-## 🇺🇸 English Description
-
-<details>
-<summary><strong>View Details</strong></summary>
-
-### Overview
-
-BroadcastApp's Cloud Functions, responsible for automatic processing of scheduled messages. Uses **Firebase Functions v2** with **Node 18** and **TypeScript**.
-
-### Function: `processScheduledMessages`
+## Estrutura
 
 ```
-Trigger: Cloud Scheduler (every 1 minute)
-Action:  Queries messages with status "scheduled" and scheduledFor <= now
-         Batch updates them to status "sent" with sentAt timestamp
+src/
+├── index.ts                         # registro das funções e opções globais (região, instâncias)
+├── config/runtime.ts                # região, agenda e tamanho de página
+├── domain/                          # coleções, campos, status e escopo do tenant
+├── lib/pagination.ts                # percorre consultas por páginas (startAfter)
+├── lib/bulkWrite.ts                 # escreve em lote com BulkWriter
+├── messages/dispatchDueMessages.ts
+└── cascade/
+    ├── deleteConnectionData.ts
+    └── detachContactFromMessages.ts
 ```
 
-**Flow:**
+## Scripts
 
-1. Scheduler fires every 1 minute
-2. Firestore query: `messages` where `status == 'scheduled'` AND `scheduledFor <= now`
-3. If no messages found, exits with no action
-4. Executes `batch.update()` marking each message as `sent`
-5. Logs success with processed count
-
-### Structure
-
-```
-functions/
-├── src/
-│   └── index.ts          # processScheduledMessages function
-├── lib/                  # Compiled output (generated by tsc)
-├── package.json          # Dependencies (firebase-admin, firebase-functions)
-└── tsconfig.json         # TypeScript configuration
-```
-
-### Dependencies
-
-| Package | Version | Purpose |
-|---|---|---|
-| `firebase-admin` | ^12.1.0 | Admin access to Firestore |
-| `firebase-functions` | ^5.0.1 | Cloud Functions v2 SDK |
-
-### Commands
-
-```bash
-npm install          # Install dependencies
-npm run build        # Compile TypeScript
-npm run serve        # Emulate locally
-npm run deploy       # Deploy to Firebase
-npm run logs         # View execution logs
-```
-
-### Prerequisites
-
-- Firebase project on the **Blaze plan** (pay-as-you-go) — required for Cloud Functions
-- Firebase CLI installed (`npm i -g firebase-tools`)
-- Authenticated via `firebase login`
-
-### Deploy
-
-```bash
-# Deploy functions only
-npx firebase-tools deploy --only functions
-
-# Full deploy (firestore + hosting + functions)
-npx firebase-tools deploy
-```
-
-</details>
+| Script | Descrição |
+|---|---|
+| `npm run build` | compila para `lib/` |
+| `npm run lint` / `npm run typecheck` | ESLint e TypeScript |
+| `npm test` | testes no emulador do Firestore (`../scripts/with-emulators.mjs`) |
+| `npm run test:coverage` | idem, com cobertura (lcov) |
+| `npm run deploy` | `firebase deploy --only functions` |

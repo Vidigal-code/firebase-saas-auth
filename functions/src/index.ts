@@ -1,38 +1,40 @@
-import * as functions from 'firebase-functions/v2';
-import * as admin from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { logger } from 'firebase-functions';
+import { onDocumentDeleted } from 'firebase-functions/v2/firestore';
+import { setGlobalOptions } from 'firebase-functions/v2/options';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { deleteConnectionData } from './cascade/deleteConnectionData';
+import { detachContactFromMessages } from './cascade/detachContactFromMessages';
+import { DISPATCH_SCHEDULE, MAX_INSTANCES, REGION } from './config/runtime';
+import { COLLECTIONS } from './domain/collections';
+import { readClientId } from './domain/tenant';
+import { dispatchDueMessages } from './messages/dispatchDueMessages';
 
-admin.initializeApp();
+initializeApp();
+setGlobalOptions({ region: REGION, maxInstances: MAX_INSTANCES });
 
-const db = admin.firestore();
+const db = getFirestore();
 
-export const processScheduledMessages = functions.scheduler.onSchedule('every 1 minutes', async (event) => {
-  const now = new Date().toISOString();
-  
-  try {
-    const snapshot = await db.collection('messages')
-      .where('status', '==', 'scheduled')
-      .where('scheduledFor', '<=', now)
-      .get();
+export const dispatchScheduledMessages = onSchedule({ schedule: DISPATCH_SCHEDULE, retryCount: 0 }, async () => {
+  const summary = await dispatchDueMessages(db, Timestamp.now());
+  logger.info('Scheduled messages dispatched', summary);
+});
 
-    if (snapshot.empty) {
-      console.log('No scheduled messages to send at this time.');
-      return;
-    }
+export const cleanupDeletedConnection = onDocumentDeleted(`${COLLECTIONS.connections}/{connectionId}`, async (event) => {
+  const clientId = readClientId(event.data?.data());
+  if (!clientId) return;
 
-    const batch = db.batch();
-    
-    snapshot.docs.forEach(doc => {
-      batch.update(doc.ref, { 
-        status: 'sent',
-        sentAt: now
-      });
-      console.log(`Marking message ${doc.id} as sent.`);
-    });
+  const { connectionId } = event.params;
+  const deleted = await deleteConnectionData(db, { clientId, connectionId });
+  logger.info('Connection data removed', { connectionId, deleted });
+});
 
-    await batch.commit();
-    console.log(`Successfully processed ${snapshot.size} scheduled messages.`);
-    
-  } catch (error) {
-    console.error('Error processing scheduled messages:', error);
-  }
+export const detachDeletedContact = onDocumentDeleted(`${COLLECTIONS.contacts}/{contactId}`, async (event) => {
+  const clientId = readClientId(event.data?.data());
+  if (!clientId) return;
+
+  const { contactId } = event.params;
+  const updated = await detachContactFromMessages(db, { clientId, contactId });
+  logger.info('Deleted contact detached from messages', { contactId, updated });
 });
