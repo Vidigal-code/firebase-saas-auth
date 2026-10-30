@@ -1,43 +1,54 @@
 # Primeiros passos
 
-## Pré-requisitos
+SaaS de broadcast multiusuário. Cada conta gerencia conexões, contatos e mensagens próprias. O envio é uma simulação: marcar uma mensagem como sent não entrega WhatsApp, SMS ou e-mail. A documentação descreve o código local; o estado de faturamento e as funções efetivamente publicadas devem ser conferidos no Firebase.
 
-- **Node.js 22** e npm 10+
-- **Java 21+** (necessário para o emulador do Firestore)
-- **Firebase CLI** (`npm install --global firebase-tools`)
-- Um projeto Firebase no plano **Blaze** (obrigatório para Cloud Functions agendadas) com Authentication (e-mail/senha) e Firestore habilitados
+## Configuração e implantação
 
-## Instalação
+Use Node 22 e Java 21+ para os emuladores. Execute install:all, copie web/.env.example, execute npm run build para gerar functions/lib e web/dist, e então inicie emulators e web dev:emulators. O projeto demo-broadcast evita atingir dados reais. Rode lint, typecheck, test e build na raiz. Para permission-denied confira clientId e a conexão; para consultas com índice ausente confira firestore.indexes.json; para agendamentos parados confira implantação, logs e flag. Cloud Functions em produção dependem de faturamento habilitado; consulte a documentação Firebase antes de ativar custos. O workflow firebase-deploy é separado do GitPageDocs.
 
-```bash
-git clone https://github.com/Vidigal-code/firebase-saas-auth.git
-cd firebase-saas-auth
+## Comandos de execução
+
+```sh
 npm run install:all
-cp web/.env.example web/.env
-```
-
-Preencha `web/.env` com a configuração do app web do Firebase (`firebase apps:sdkconfig WEB`).
-
-## Rodando localmente com os emuladores
-
-```bash
-npm run emulators            # Auth, Firestore e Functions locais
+npm run build
+npm run emulators
+# In another terminal
 npm --prefix web run dev:emulators
+# Validation
+npm run lint
+npm run typecheck
+npm test
+npm run build
 ```
 
-A aplicação fica em `http://localhost:5173` e a interface dos emuladores em `http://localhost:4000`.
+Nomes extraídos apenas dos arquivos de exemplo e das referências a variáveis no código. Configure os valores localmente; credenciais privadas não fazem parte desta referência. Variáveis NEXT_PUBLIC_ e VITE_ são públicas no navegador.
 
-> O emulador de Functions não executa funções agendadas sem o emulador de Pub/Sub; o disparo automático das mensagens agendadas é validado pelos testes de `functions/` e em produção.
+| Variable | Origem |
+| --- | --- |
+| `VITE_DEFAULT_LANG` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example) |
+| `VITE_FIREBASE_API_KEY` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example), [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_FIREBASE_APP_ID` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example), [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_FIREBASE_AUTH_DOMAIN` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example), [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_FIREBASE_MEASUREMENT_ID` | [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example), [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_FIREBASE_PROJECT_ID` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example), [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_FIREBASE_STORAGE_BUCKET` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example), [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_SCHEDULED_DISPATCH_ENABLED` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example) |
+| `VITE_START_LANG` | [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_START_THEME` | [web/envexample.txt](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/envexample.txt) |
+| `VITE_USE_EMULATORS` | [web/.env.example](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/.env.example) |
 
-## Scripts principais (raiz)
+## Arquivos relacionados
 
-| Script | O que faz |
-|---|---|
-| `npm run lint` | ESLint em `functions/` e `web/` |
-| `npm run typecheck` | TypeScript de testes de regras, functions e web |
-| `npm test` | Regras do Firestore, Cloud Functions, testes unitários e de integração do web |
-| `npm run build` | Build das Functions e do web |
-| `npm run deploy` | Deploy de regras, índices e Hosting |
-| `npm run deploy:functions` | Deploy das Cloud Functions (requer o plano Blaze) |
+- [firestore.rules](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.rules)
+- [firebase.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firebase.json)
+- [firestore.indexes.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.indexes.json)
+- [functions/src/index.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/index.ts)
+- [functions/src/messages/dispatchDueMessages.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/messages/dispatchDueMessages.ts)
+- [web/src/entities/message/api/messagesRepository.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/src/entities/message/api/messagesRepository.ts)
+- [.github/workflows/firebase-deploy.yml](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/.github/workflows/firebase-deploy.yml)
 
-Os testes que usam emuladores rodam por meio de `scripts/with-emulators.mjs`, que sobe os emuladores necessários e os encerra ao final.
+## Navegação
+
+- [Project guide](?menu=pt&lang=pt&id=8)
+- [Source reference](?menu=pt&lang=pt&id=9)

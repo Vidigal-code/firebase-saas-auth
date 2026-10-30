@@ -1,39 +1,28 @@
 # Arquitetura
 
-## Frontend: Feature-Sliced Design
+SaaS de broadcast multiusuário. Cada conta gerencia conexões, contatos e mensagens próprias. O envio é uma simulação: marcar uma mensagem como sent não entrega WhatsApp, SMS ou e-mail. A documentação descreve o código local; o estado de faturamento e as funções efetivamente publicadas devem ser conferidos no Firebase.
 
-```
-web/src/
-├── app/        # Providers (tema, i18n, sessão, notificações), rotas e estilos globais
-├── pages/      # Telas: home, login, cadastro, conexões, contatos, broadcast, 404
-├── widgets/    # Layouts: app shell (topo, menu da conta) e layout da conexão (abas)
-├── features/   # Casos de uso: auth, editores de conexão/contato, compositor e filtro de mensagens
-├── entities/   # Modelos, repositórios Firestore e hooks: session, connection, contact, message
-└── shared/     # Firebase, i18n, tema, hooks e componentes genéricos
-```
+## Fluxo e casos de falha
 
-- **Repositórios** (`entities/*/api`) concentram o acesso ao Firestore: consultas tipadas com conversores e funções de escrita com payloads explícitos.
-- **Tempo real**: `useRealtimeQuery` e `useRealtimeDocument` assinam consultas com `onSnapshot` e nunca exibem dados de uma consulta anterior.
-- **Estado**: a sessão vem de `onAuthStateChanged` (contexto React); os dados vêm direto dos listeners do Firestore, sem cache global extra.
-- **Estilo**: componentes do Material UI, estilização com classes Tailwind. As camadas CSS (`theme, base, mui, components, utilities`) fazem o Tailwind ter prioridade, e as cores do tema MUI viram utilitários Tailwind (`bg-background-paper`, `text-primary`...).
+1. Cadastro/login → Firebase Auth → SessionProvider → guard de rota → consultas filtradas pelo uid. A criação do perfil usa users/{uid}; conexões, contatos e mensagens são coleções planas com clientId. Listas usam onSnapshot e atualizam a interface em tempo real.
 
-## Backend: Cloud Functions
+2. Conexão → contato com telefone normalizado → seleção dos destinatários → composição. Enviar agora grava status sent, sentAt do servidor e scheduledAt nulo. Agendar grava scheduled e data futura; é possível reagendar ou enviar uma mensagem agendada manualmente. Uma mensagem já enviada mantém seus campos de entrega.
 
-```
-functions/src/
-├── index.ts                    # Registro das funções
-├── messages/dispatchDueMessages.ts
-├── cascade/deleteConnectionData.ts
-├── cascade/detachContactFromMessages.ts
-├── lib/                        # Paginação e escrita em lote (BulkWriter)
-├── domain/                     # Coleções, campos e status
-└── config/runtime.ts           # Região, agenda e tamanho de página
-```
+3. dispatchScheduledMessages executa a cada minuto, consulta mensagens vencidas por status/data e processa páginas com BulkWriter. A precondição lastUpdateTime evita sobrescrever uma edição concorrente; a próxima execução reavalia o documento. Não há integração externa de entrega nem garantia de disparo no segundo exato.
 
-| Função | Gatilho | Responsabilidade |
-|---|---|---|
-| `dispatchScheduledMessages` | Agenda (a cada 1 min) | Muda `scheduled` → `sent` quando `scheduledAt <= agora` |
-| `cleanupDeletedConnection` | `connections/{id}` excluído | Remove contatos e mensagens da conexão |
-| `detachDeletedContact` | `contacts/{id}` excluído | Remove o contato de `contactIds` das mensagens |
+4. Excluir conexão dispara cleanupDeletedConnection para remover contatos e mensagens relacionados; excluir contato dispara detachDeletedContact para removê-lo dos destinatários. Essas limpezas dependem das Functions implantadas. VITE_SCHEDULED_DISPATCH_ENABLED controla os avisos do web e a condição do workflow de deploy; mudar a flag sozinha não publica funções.
 
-O disparo usa uma pré-condição (`lastUpdateTime`): se o cliente editar a mensagem no mesmo instante, a escrita é descartada e a mensagem é reavaliada no minuto seguinte.
+## Arquivos relacionados
+
+- [firestore.rules](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.rules)
+- [firebase.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firebase.json)
+- [firestore.indexes.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.indexes.json)
+- [functions/src/index.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/index.ts)
+- [functions/src/messages/dispatchDueMessages.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/messages/dispatchDueMessages.ts)
+- [web/src/entities/message/api/messagesRepository.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/src/entities/message/api/messagesRepository.ts)
+- [.github/workflows/firebase-deploy.yml](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/.github/workflows/firebase-deploy.yml)
+
+## Navegação
+
+- [Project guide](?menu=pt&lang=pt&id=8)
+- [Source reference](?menu=pt&lang=pt&id=9)

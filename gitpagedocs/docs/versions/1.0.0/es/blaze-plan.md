@@ -1,44 +1,30 @@
-# Plan Blaze de Firebase
+# Plan Blaze
 
-> La app está publicada y funcionando, pero el cambio automático de **"Programado" a "Enviado"** depende de Cloud Functions, y Firebase solo publica Cloud Functions en el plan **Blaze**. El código está listo y probado y queda apagado con la flag `VITE_SCHEDULED_DISPATCH_ENABLED`=false hasta el upgrade.
+SaaS de difusión multiusuario. Cada cuenta gestiona sus conexiones, contactos y mensajes. El envío es simulado: marcar sent no entrega WhatsApp, SMS ni correo. Esta guía describe el código; compruebe la facturación y las funciones desplegadas en Firebase.
 
-## Spark vs Blaze
+## Contratos de datos
 
-| | **Spark** (actual) | **Blaze** |
-|---|---|---|
-| Precio | Gratis | Pago por uso |
-| Cuotas gratuitas | Sí | Las mismas de Spark; solo se cobra lo que las supere |
-| Tarjeta de crédito | No hace falta | Requiere una cuenta de facturación |
-| Hosting, Auth, Firestore | ✅ | ✅ |
-| Cloud Functions | ❌ | ✅ |
-| Cloud Scheduler | ❌ | ✅ |
+firestore.rules exige propietario autenticado, timestamps del servidor, esquema permitido y conexión propia. Nombres: 80; contenido: 1000; destinatarios: 1–200; teléfono según el patrón de reglas. Las reglas no validan cada ID de contacto individualmente; no garantizan integridad referencial adicional. Los guards de interfaz no sustituyen las reglas. Las credenciales administrativas no pertenecen al frontend.
 
-## Por qué este proyecto lo necesita
+## Flujo y casos de fallo
 
-El desafío pide que los mensajes programados pasen a "Enviado" en el backend, con Cloud Functions, sin depender de la app abierta. Lo hace la función `dispatchScheduledMessages`, cada minuto. Las funciones de limpieza en cascada `cleanupDeletedConnection` y `detachDeletedContact` también requieren Blaze.
+Registro/login → Firebase Auth → SessionProvider → guard de ruta → consultas por uid. Los perfiles usan users/{uid}; conexiones, contactos y mensajes son colecciones planas con clientId. Las listas usan onSnapshot en tiempo real.
 
-## Cuánto cuesta
+Use Node 22 y Java 21+ para emuladores. Ejecute install:all, copie web/.env.example, ejecute npm run build para generar functions/lib y web/dist, y después inicie emulators y web dev:emulators. demo-broadcast evita datos reales. Ejecute lint, typecheck, test y build en la raíz. Ante permission-denied revise clientId y conexión; ante índices ausentes revise firestore.indexes.json; ante agendas detenidas revise despliegue, logs y flag. Functions en producción requieren facturación; consulte Firebase antes de habilitar costes. firebase-deploy es independiente de GitPageDocs.
 
-El costo esperado para esta app es **cero**, porque el uso queda por debajo de las cuotas gratuitas mensuales. Los valores vienen de [firebase.google.com/pricing](https://firebase.google.com/pricing) y pueden cambiar.
+## Archivos relacionados
 
-| Recurso | Uso estimado | Gratis por mes |
-|---|---|---|
-| Invocaciones de Cloud Functions | ~44 mil | 2 millones |
-| Tiempo de ejecución | algunos miles de GB-s | 400 mil GB-s |
-| Imágenes de las Functions (Artifact Registry) | algunos cientos de MB | 500 MB |
-| Cloud Scheduler | 1 job | 3 jobs |
-| Firestore | uso de prueba | 50 mil lecturas y 20 mil escrituras por día |
-| Hosting | ~1,5 MB por visita | 360 MB/día |
+- [firestore.rules](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.rules)
+- [firebase.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firebase.json)
+- [firestore.indexes.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.indexes.json)
+- [functions/src/index.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/index.ts)
+- [functions/src/messages/dispatchDueMessages.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/messages/dispatchDueMessages.ts)
+- [web/src/entities/message/api/messagesRepository.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/src/entities/message/api/messagesRepository.ts)
+- [.github/workflows/firebase-deploy.yml](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/.github/workflows/firebase-deploy.yml)
 
-## Cómo activarlo
+## Navegación
 
-1. Abre https://console.firebase.google.com/project/fir-saas-auth-4a138/usage/details y confirma que el proyecto es **fir-saas-auth-4a138**.
-2. Haz clic en **Modify plan**, elige **Blaze** y vincula una cuenta de facturación.
-3. Si sigue apareciendo Spark, revisa la cuenta vinculada en https://console.cloud.google.com/billing/linkedaccount?project=fir-saas-auth-4a138.
-4. Activa `VITE_SCHEDULED_DISPATCH_ENABLED`="true" en `web/.env` y en el repositorio (`gh variable set VITE_SCHEDULED_DISPATCH_ENABLED --body true`).
-5. Publica con `npm run deploy:functions && npm run deploy`.
+- [Project guide](?menu=es&lang=es&id=8)
+- [Source reference](?menu=es&lang=es&id=9)
 
-## Cómo evitar sorpresas
-
-- Crea una alerta de presupuesto en https://console.cloud.google.com/billing/budgets (por ejemplo, US$ 1). Avisa por correo, pero no bloquea los cargos.
-- Para volver al plan gratis: apaga la flag, elimina las funciones con `npx firebase functions:delete` y vuelve a Spark.
+[Firebase Functions](https://firebase.google.com/docs/functions/get-started) · [Firebase pricing](https://firebase.google.com/pricing)

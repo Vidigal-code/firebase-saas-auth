@@ -1,36 +1,28 @@
 # Funcionalidades
 
-## Autenticação
+SaaS de broadcast multiusuário. Cada conta gerencia conexões, contatos e mensagens próprias. O envio é uma simulação: marcar uma mensagem como sent não entrega WhatsApp, SMS ou e-mail. A documentação descreve o código local; o estado de faturamento e as funções efetivamente publicadas devem ser conferidos no Firebase.
 
-- Cadastro e login com e-mail e senha (Firebase Authentication).
-- Política de senha: mínimo de 8 caracteres com maiúscula, minúscula, número e símbolo.
-- Troca de senha com reautenticação.
-- Cada usuário cadastrado é um **cliente**; o `uid` dele é o `clientId` de todos os seus dados.
-- Rotas protegidas por `RequireAuth` e `RequireGuest`.
+## Fluxo e casos de falha
 
-## Conexões
+1. Cadastro/login → Firebase Auth → SessionProvider → guard de rota → consultas filtradas pelo uid. A criação do perfil usa users/{uid}; conexões, contatos e mensagens são coleções planas com clientId. Listas usam onSnapshot e atualizam a interface em tempo real.
 
-- Criar, listar (tempo real), renomear e excluir.
-- Ao excluir uma conexão, a Cloud Function `cleanupDeletedConnection` remove os contatos e as mensagens dela.
+2. Conexão → contato com telefone normalizado → seleção dos destinatários → composição. Enviar agora grava status sent, sentAt do servidor e scheduledAt nulo. Agendar grava scheduled e data futura; é possível reagendar ou enviar uma mensagem agendada manualmente. Uma mensagem já enviada mantém seus campos de entrega.
 
-## Contatos
+3. dispatchScheduledMessages executa a cada minuto, consulta mensagens vencidas por status/data e processa páginas com BulkWriter. A precondição lastUpdateTime evita sobrescrever uma edição concorrente; a próxima execução reavalia o documento. Não há integração externa de entrega nem garantia de disparo no segundo exato.
 
-- Nome e telefone por conexão; o telefone é normalizado (ex.: `+55 (11) 99999-8888` → `+5511999998888`) e validado.
-- Ao excluir um contato, a Cloud Function `detachDeletedContact` o remove dos destinatários das mensagens.
+4. Excluir conexão dispara cleanupDeletedConnection para remover contatos e mensagens relacionados; excluir contato dispara detachDeletedContact para removê-lo dos destinatários. Essas limpezas dependem das Functions implantadas. VITE_SCHEDULED_DISPATCH_ENABLED controla os avisos do web e a condição do workflow de deploy; mudar a flag sozinha não publica funções.
 
-## Broadcast
+## Arquivos relacionados
 
-- Seleção de um ou vários contatos (busca e "selecionar todos").
-- **Enviar agora**: a mensagem é gravada como `sent` com o horário do servidor (simulação do envio).
-- **Agendar**: a mensagem fica `scheduled` até o horário escolhido, que precisa estar no futuro.
-- **Disparo automático**: a Cloud Function `dispatchScheduledMessages` roda a cada minuto e muda para `sent` toda mensagem cujo horário chegou, mesmo com o app fechado. A atualização aparece na tela em tempo real. Implementada e testada, mas **inativa no app publicado** (flag `VITE_SCHEDULED_DISPATCH_ENABLED=false`): publicar Cloud Functions exige o plano Blaze do Firebase. Enquanto a flag está desligada, o app avisa que o disparo automático está inativo e as mensagens agendadas podem ser enviadas por "Editar → Enviar agora".
-- Filtros **Todas / Enviadas / Agendadas** com contadores.
-- Edição: mensagens agendadas podem mudar texto, contatos e horário (ou ser enviadas agora); mensagens enviadas só mudam texto e contatos.
-- Exclusão com confirmação.
+- [firestore.rules](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.rules)
+- [firebase.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firebase.json)
+- [firestore.indexes.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.indexes.json)
+- [functions/src/index.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/index.ts)
+- [functions/src/messages/dispatchDueMessages.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/messages/dispatchDueMessages.ts)
+- [web/src/entities/message/api/messagesRepository.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/src/entities/message/api/messagesRepository.ts)
+- [.github/workflows/firebase-deploy.yml](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/.github/workflows/firebase-deploy.yml)
 
-## Experiência
+## Navegação
 
-- Interface em Português, Inglês e Espanhol (`?lang=en` também funciona).
-- Tema claro e escuro.
-- 100% responsivo: abaixo de 900px o topo vira um menu hambúrguer (navegação, conta, idioma e tema); abaixo de 600px o conteúdo fica centralizado, um item embaixo do outro, e os dialogs ocupam a tela inteira.
-- Feedback com notificações e estados de carregamento, erro e vazio.
+- [Project guide](?menu=pt&lang=pt&id=8)
+- [Source reference](?menu=pt&lang=pt&id=9)

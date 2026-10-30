@@ -37,6 +37,34 @@
   },
   "routes-md": [
     {
+      "id": 8,
+      "title": {
+        "pt": "Contexto e fluxos do projeto",
+        "en": "Project context and workflows",
+        "es": "Contexto y flujos del proyecto"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
+      "id": 9,
+      "title": {
+        "pt": "Referência do código",
+        "en": "Source reference",
+        "es": "Referencia del código"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
       "id": 1,
       "title": {
         "pt": "Primeiros passos",
@@ -44,9 +72,9 @@
         "es": "Primeros pasos"
       },
       "description": {
-        "pt": "Instale e configure o projeto do zero",
-        "en": "Install and configure the project from scratch",
-        "es": "Instala y configura el proyecto desde cero"
+        "pt": "Primeiros passos",
+        "en": "Getting Started",
+        "es": "Primeros pasos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -81,9 +109,9 @@
         "es": "Visión general del proyecto"
       },
       "description": {
-        "pt": "Stack, arquitetura e princípios do BroadcastApp",
-        "en": "Stack, architecture and principles of BroadcastApp",
-        "es": "Stack, arquitectura y principios de BroadcastApp"
+        "pt": "Visão geral do projeto",
+        "en": "Project Overview",
+        "es": "Visión general del proyecto"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -118,9 +146,9 @@
         "es": "Funcionalidades"
       },
       "description": {
-        "pt": "Auth, conexões, contatos, broadcast e agendamento",
-        "en": "Auth, connections, contacts, broadcast and scheduling",
-        "es": "Auth, conexiones, contactos, broadcast y programación"
+        "pt": "Funcionalidades",
+        "en": "Functionalities",
+        "es": "Funcionalidades"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -155,9 +183,9 @@
         "es": "Variables de entorno y deploy"
       },
       "description": {
-        "pt": "Configuração do .env e deploy automático com GitHub Actions",
-        "en": ".env configuration and automatic deploy with GitHub Actions",
-        "es": "Configuración del .env y deploy automático con GitHub Actions"
+        "pt": "Variáveis de ambiente e deploy",
+        "en": "Environment Variables & Deploy",
+        "es": "Variables de entorno y deploy"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -192,9 +220,9 @@
         "es": "Arquitectura"
       },
       "description": {
-        "pt": "Feature-Sliced Design, repositórios Firestore e Cloud Functions",
-        "en": "Feature-Sliced Design, Firestore repositories and Cloud Functions",
-        "es": "Feature-Sliced Design, repositorios Firestore y Cloud Functions"
+        "pt": "Arquitetura",
+        "en": "Architecture",
+        "es": "Arquitectura"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -229,9 +257,9 @@
         "es": "Reglas Firestore y seguridad"
       },
       "description": {
-        "pt": "Modelo de dados, isolamento multi-tenant e testes das regras",
-        "en": "Data model, multi-tenant isolation and rules tests",
-        "es": "Modelo de datos, aislamiento multi-tenant y pruebas de reglas"
+        "pt": "Regras Firestore e segurança",
+        "en": "Firestore Rules & Security",
+        "es": "Reglas Firestore y seguridad"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -266,9 +294,9 @@
         "es": "Plan Blaze"
       },
       "description": {
-        "pt": "O que é, quanto custa e como ativar as Cloud Functions",
-        "en": "What it is, how much it costs and how to enable Cloud Functions",
-        "es": "Qué es, cuánto cuesta y cómo activar las Cloud Functions"
+        "pt": "Plano Blaze",
+        "en": "Blaze Plan",
+        "es": "Plan Blaze"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -301,6 +329,36 @@
   "routes-video": [],
   "routes-audio": [],
   "menus-header-md": [
+    {
+      "id": 8,
+      "pt": {
+        "title": "Contexto e fluxos do projeto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md"
+      },
+      "en": {
+        "title": "Project context and workflows",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md"
+      },
+      "es": {
+        "title": "Contexto y flujos del proyecto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      }
+    },
+    {
+      "id": 9,
+      "pt": {
+        "title": "Referência do código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md"
+      },
+      "en": {
+        "title": "Source reference",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md"
+      },
+      "es": {
+        "title": "Referencia del código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      }
+    },
     {
       "id": 1,
       "pt": {

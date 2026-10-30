@@ -1,36 +1,28 @@
-# Firestore rules and security
+# Firestore Rules & Security
 
-## Data model (no subcollections)
+Multiuser broadcast SaaS. Each account manages its own connections, contacts and messages. Sending is simulated: marking a message sent does not deliver WhatsApp, SMS or email. This guide describes the source; verify billing and deployed functions in Firebase.
 
-| Collection | Fields |
-|---|---|
-| `users/{uid}` | `email`, `createdAt` |
-| `connections/{id}` | `clientId`, `name`, `createdAt`, `updatedAt` |
-| `contacts/{id}` | `clientId`, `connectionId`, `name`, `phone`, `createdAt`, `updatedAt` |
-| `messages/{id}` | `clientId`, `connectionId`, `contactIds[]`, `content`, `status`, `scheduledAt`, `sentAt`, `createdAt`, `updatedAt` |
+## Data contracts
 
-Every document carries the `clientId` (the owner's `uid`). Contacts and messages also carry the `connectionId`, so queries filter by `clientId` + `connectionId` without needing subcollections.
+firestore.rules requires the authenticated owner, server timestamps, allowed schema and an owned connection. Names are limited to 80, content to 1000, recipients to 1–200; phones follow the rule pattern. Rules do not validate each contact ID individually: do not claim stronger referential integrity. UI guards do not replace rules. Public Firebase configuration is not an admin credential; service-account secrets stay outside the frontend.
 
-## Isolation strategy
+## Workflow and failure cases
 
-1. **Read**: allowed only if `resource.data.clientId == request.auth.uid`. Queries without the `where('clientId', '==', uid)` filter are rejected.
-2. **Create**: the submitted `clientId` must be the authenticated user's, and the `connectionId` must point to a connection **owned by that same client** (checked with `get()`).
-3. **Update**: `clientId` and `connectionId` are immutable (`diff().affectedKeys()`), which prevents moving data to another client.
-4. **Schema validation**: exact fields (`hasOnly`), non-empty strings with length limits, phone by regex, 1 to 200 recipients.
-5. **Server timestamps**: `createdAt`, `updatedAt`, and `sentAt` must be `request.time`.
-6. **Message lifecycle**:
-   - created as `sent` (with `sentAt = request.time`) or as `scheduled` with `scheduledAt` in the future;
-   - a scheduled message can be rescheduled or sent now;
-   - a sent message keeps its status and delivery timestamps;
-   - only the Cloud Function (Admin SDK) performs the automatic transition at the scheduled time.
+Registration/login → Firebase Auth → SessionProvider → route guard → uid-scoped queries. Profiles use users/{uid}; connections, contacts and messages are flat collections with clientId. Lists use onSnapshot for real-time UI updates.
 
-## Tests
+Use Node 22 and Java 21+ for emulators. Run install:all, copy web/.env.example, run npm run build to generate functions/lib and web/dist, then start emulators and web dev:emulators. The demo-broadcast project avoids production data. Run root lint, typecheck, test and build. For permission-denied check clientId and connection ownership; for missing indexes check firestore.indexes.json; for stalled schedules check deployment, logs and the flag. Production Cloud Functions require billing; check Firebase documentation before enabling costs. firebase-deploy is separate from GitPageDocs.
 
-- `tests/firestore.rules.test.ts`: 25 scenarios on the emulator (another client cannot read, edit, delete, or reference someone else's data; schema; lifecycle).
-- `web/src/test/tenantFlow.integration.test.ts`: the app's real repositories against the Auth and Firestore emulators, including cross-client access denial.
+## Related files
 
-## Frontend routes
+- [firestore.rules](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.rules)
+- [firebase.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firebase.json)
+- [firestore.indexes.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.indexes.json)
+- [functions/src/index.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/index.ts)
+- [functions/src/messages/dispatchDueMessages.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/messages/dispatchDueMessages.ts)
+- [web/src/entities/message/api/messagesRepository.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/src/entities/message/api/messagesRepository.ts)
+- [.github/workflows/firebase-deploy.yml](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/.github/workflows/firebase-deploy.yml)
 
-- `RequireAuth`: `/connections`, `/connections/:id/contacts`, `/connections/:id/broadcast`.
-- `RequireGuest`: `/`, `/login`, `/register`.
-- Opening another client's connection by URL shows "Connection not found": the read is denied by the rules.
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=8)
+- [Source reference](?menu=en&lang=en&id=9)

@@ -1,45 +1,28 @@
 # Variáveis de ambiente e deploy
 
-## Variáveis do frontend (`web/.env`)
+SaaS de broadcast multiusuário. Cada conta gerencia conexões, contatos e mensagens próprias. O envio é uma simulação: marcar uma mensagem como sent não entrega WhatsApp, SMS ou e-mail. A documentação descreve o código local; o estado de faturamento e as funções efetivamente publicadas devem ser conferidos no Firebase.
 
-| Variável | Descrição |
-|---|---|
-| `VITE_FIREBASE_API_KEY` | API key do app web |
-| `VITE_FIREBASE_AUTH_DOMAIN` | Domínio de autenticação |
-| `VITE_FIREBASE_PROJECT_ID` | ID do projeto |
-| `VITE_FIREBASE_STORAGE_BUCKET` | Bucket do Storage |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Sender ID |
-| `VITE_FIREBASE_APP_ID` | App ID |
-| `VITE_USE_EMULATORS` | `true` conecta Auth e Firestore aos emuladores locais |
-| `VITE_DEFAULT_LANG` | Idioma inicial: `pt`, `en` ou `es` |
-| `VITE_SCHEDULED_DISPATCH_ENABLED` | Feature flag do disparo automático: `true` só depois de publicar as Cloud Functions (plano Blaze). Hoje `false` |
+## Fluxo e casos de falha
 
-As variáveis são validadas com Zod na inicialização: se faltar alguma, o app informa qual.
+1. Cadastro/login → Firebase Auth → SessionProvider → guard de rota → consultas filtradas pelo uid. A criação do perfil usa users/{uid}; conexões, contatos e mensagens são coleções planas com clientId. Listas usam onSnapshot e atualizam a interface em tempo real.
 
-## Deploy manual
+2. Conexão → contato com telefone normalizado → seleção dos destinatários → composição. Enviar agora grava status sent, sentAt do servidor e scheduledAt nulo. Agendar grava scheduled e data futura; é possível reagendar ou enviar uma mensagem agendada manualmente. Uma mensagem já enviada mantém seus campos de entrega.
 
-```bash
-firebase login
-npm run deploy            # regras, índices e Hosting
-npm run deploy:functions  # Cloud Functions (requer o plano Blaze)
-```
+3. dispatchScheduledMessages executa a cada minuto, consulta mensagens vencidas por status/data e processa páginas com BulkWriter. A precondição lastUpdateTime evita sobrescrever uma edição concorrente; a próxima execução reavalia o documento. Não há integração externa de entrega nem garantia de disparo no segundo exato.
 
-## Deploy automático (GitHub Actions)
+4. Excluir conexão dispara cleanupDeletedConnection para remover contatos e mensagens relacionados; excluir contato dispara detachDeletedContact para removê-lo dos destinatários. Essas limpezas dependem das Functions implantadas. VITE_SCHEDULED_DISPATCH_ENABLED controla os avisos do web e a condição do workflow de deploy; mudar a flag sozinha não publica funções.
 
-O workflow `.github/workflows/firebase-deploy.yml` roda a cada push na `main`:
+## Arquivos relacionados
 
-1. **quality**: lint, typecheck, testes (regras, Functions, web unitário e integração com emuladores) e build.
-2. **deploy**: publica regras e índices do Firestore e Hosting; as Cloud Functions só entram quando a variável `VITE_SCHEDULED_DISPATCH_ENABLED` do repositório é `true`. Só roda quando o secret `FIREBASE_SERVICE_ACCOUNT` existe.
+- [firestore.rules](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.rules)
+- [firebase.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firebase.json)
+- [firestore.indexes.json](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/firestore.indexes.json)
+- [functions/src/index.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/index.ts)
+- [functions/src/messages/dispatchDueMessages.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/functions/src/messages/dispatchDueMessages.ts)
+- [web/src/entities/message/api/messagesRepository.ts](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/web/src/entities/message/api/messagesRepository.ts)
+- [.github/workflows/firebase-deploy.yml](https://github.com/Vidigal-code/firebase-saas-auth/blob/8fec8eb0c5e82a43f44f1ad60372a32b5f326434/.github/workflows/firebase-deploy.yml)
 
-Configuração necessária no GitHub:
+## Navegação
 
-- **Variables** (`Settings → Secrets and variables → Actions → Variables`): as seis variáveis `VITE_FIREBASE_*` acima.
-- **Secret** `FIREBASE_SERVICE_ACCOUNT`: JSON de uma conta de serviço do projeto com os papéis *Firebase Admin*, *Cloud Functions Admin*, *Service Account User* e *Cloud Scheduler Admin*.
-
-Pull requests executam apenas o job de qualidade.
-
-## Plano Blaze (Cloud Functions)
-
-Publicar Cloud Functions exige o plano **Blaze** (pague pelo que usar) do Firebase. Ele mantém as cotas gratuitas do plano Spark e só cobra o excedente, mas pede uma conta de faturamento (cartão). Para o uso deste app (~44 mil invocações por mês para 2 milhões gratuitas, 1 job do Cloud Scheduler para 3 gratuitos, algumas centenas de MB de imagens para 500 MB gratuitos), o custo esperado é zero. Crie um alerta de orçamento no Google Cloud para ser avisado de qualquer custo.
-
-Explicação completa (o que é, custo e como ativar) na página **Plano Blaze**.
+- [Project guide](?menu=pt&lang=pt&id=8)
+- [Source reference](?menu=pt&lang=pt&id=9)
